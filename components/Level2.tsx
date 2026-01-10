@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { SkillNode, LogEntry } from '../types';
 import { generateSkillNodeQuestionWithFallback as generateSkillNodeQuestion } from '../services/aiService';
 import { playSound } from '../services/soundService';
-import { Brain, Pickaxe, Eye, Microscope, Lock, CheckCircle, Unlock, CircleHelp, X } from 'lucide-react';
+import { Brain, Pickaxe, Eye, Microscope, Lock, CheckCircle, Unlock, CircleHelp, X, Trophy, BarChart3 } from 'lucide-react';
 
 interface Level2Props {
     onComplete: (score: number) => void;
@@ -24,6 +24,14 @@ export const Level2: React.FC<Level2Props> = ({ onComplete, addLog }) => {
     const [loading, setLoading] = useState(false);
     const [showHelp, setShowHelp] = useState(false);
     const [currentQuiz, setCurrentQuiz] = useState<{ question: string, options: string[], correctAnswerIndex: number } | null>(null);
+    const [showSummary, setShowSummary] = useState(false);
+    const [quizHistory, setQuizHistory] = useState<{
+        nodeLabel: string;
+        question: string;
+        correctAnswer: string;
+        wasCorrect: boolean;
+        attempts: number;
+    }[]>([]);
 
     const toggleHelp = () => {
         playSound('click');
@@ -58,6 +66,15 @@ export const Level2: React.FC<Level2Props> = ({ onComplete, addLog }) => {
             playSound('success');
             addLog(`Chính xác! Đã mở khóa kiến thức: ${selectedNode.label}`, 'success');
 
+            // Save to quiz history
+            setQuizHistory(prev => [...prev, {
+                nodeLabel: selectedNode.label,
+                question: currentQuiz.question,
+                correctAnswer: currentQuiz.options[currentQuiz.correctAnswerIndex],
+                wasCorrect: true,
+                attempts: 1
+            }]);
+
             // Unlock children
             const updatedNodes = nodes.map(n => {
                 if (n.id === selectedNode.id) return { ...n, status: 'completed' as const };
@@ -67,9 +84,9 @@ export const Level2: React.FC<Level2Props> = ({ onComplete, addLog }) => {
             setNodes(updatedNodes);
             setModalOpen(false);
 
-            const allCompleted = updatedNodes.every(n => n.status === 'completed' || n.status === 'locked'); // Simplified check logic
+            // Check if all completed
             if (updatedNodes.filter(n => n.status === 'completed').length === nodes.length) {
-                onComplete(500);
+                setTimeout(() => setShowSummary(true), 500);
             }
         } else {
             playSound('error');
@@ -214,6 +231,82 @@ export const Level2: React.FC<Level2Props> = ({ onComplete, addLog }) => {
                                 </div>
                             </div>
                         )}
+                    </div>
+                </div>
+            )}
+
+            {/* Summary Modal */}
+            {showSummary && (
+                <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4 overflow-auto">
+                    <div className="bg-slate-900 border border-green-500 rounded-xl p-6 max-w-2xl w-full shadow-2xl relative my-8">
+                        <button onClick={() => { setShowSummary(false); onComplete(500); }} className="absolute top-4 right-4 text-slate-500 hover:text-white"><X size={20} /></button>
+
+                        {/* Header */}
+                        <div className="flex items-center gap-4 mb-6 pb-4 border-b border-slate-700">
+                            <div className="p-3 bg-green-500/20 rounded-full">
+                                <Trophy size={32} className="text-green-400" />
+                            </div>
+                            <div>
+                                <h3 className="text-2xl font-bold text-green-400">🎉 Hoàn thành Cây Ý Thức!</h3>
+                                <p className="text-slate-400">Bạn đã mở khóa toàn bộ kiến thức về nguồn gốc ý thức</p>
+                            </div>
+                        </div>
+
+                        {/* Statistics */}
+                        <div className="grid grid-cols-3 gap-4 mb-6">
+                            <div className="bg-slate-800 p-4 rounded-lg text-center">
+                                <div className="text-3xl font-bold text-cyan-400">{quizHistory.length}</div>
+                                <div className="text-xs text-slate-400">Câu hỏi hoàn thành</div>
+                            </div>
+                            <div className="bg-slate-800 p-4 rounded-lg text-center">
+                                <div className="text-3xl font-bold text-green-400">{quizHistory.filter(q => q.wasCorrect).length}</div>
+                                <div className="text-xs text-slate-400">Trả lời đúng</div>
+                            </div>
+                            <div className="bg-slate-800 p-4 rounded-lg text-center">
+                                <div className="text-3xl font-bold text-yellow-400">500</div>
+                                <div className="text-xs text-slate-400">Điểm nhận được</div>
+                            </div>
+                        </div>
+
+                        {/* Questions Review */}
+                        <div className="mb-6">
+                            <h4 className="text-sm font-bold text-slate-400 uppercase mb-3 flex items-center gap-2">
+                                <BarChart3 size={16} /> Tổng kết câu hỏi
+                            </h4>
+                            <div className="space-y-3 max-h-60 overflow-y-auto pr-2">
+                                {quizHistory.map((item, idx) => (
+                                    <div key={idx} className="bg-slate-800/50 p-3 rounded-lg border border-slate-700">
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <span className="text-xs bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded">{item.nodeLabel}</span>
+                                            <CheckCircle size={14} className="text-green-400" />
+                                        </div>
+                                        <p className="text-sm text-slate-300 mb-2">"{item.question}"</p>
+                                        <p className="text-xs text-green-400">
+                                            ✓ Đáp án đúng: <span className="text-white">{item.correctAnswer}</span>
+                                        </p>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Key Concepts */}
+                        <div className="bg-blue-900/20 p-4 rounded-lg border border-blue-900/50 mb-6">
+                            <h4 className="text-sm font-bold text-blue-400 mb-2">📚 Kiến thức chốt:</h4>
+                            <ul className="text-xs text-slate-300 space-y-1">
+                                <li>• <strong>Ý thức</strong> là sự phản ánh thế giới khách quan vào bộ não người</li>
+                                <li>• <strong>Bộ óc</strong> là cơ quan vật chất của ý thức</li>
+                                <li>• <strong>Lao động</strong> là điều kiện quyết định sự hình thành ý thức</li>
+                                <li>• <strong>Ngôn ngữ</strong> là vỏ vật chất của tư duy</li>
+                                <li>• <strong>Phản ánh</strong> là thuộc tính chung của mọi vật chất</li>
+                            </ul>
+                        </div>
+
+                        <button
+                            onClick={() => { setShowSummary(false); onComplete(500); }}
+                            className="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-lg transition-colors text-lg"
+                        >
+                            Tiếp tục → Cấp độ 3
+                        </button>
                     </div>
                 </div>
             )}

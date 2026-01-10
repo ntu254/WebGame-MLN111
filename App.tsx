@@ -4,13 +4,14 @@ import { Level1 } from './components/Level1';
 import { Level2 } from './components/Level2';
 import { Level3 } from './components/Level3';
 import { Leaderboard } from './components/Leaderboard';
-import { LayoutGrid, Network, Map, Trophy, User, Search, Settings, ShieldAlert } from 'lucide-react';
+import { LayoutGrid, Network, Map, Trophy, User, Search, Settings, ShieldAlert, Home as HomeIcon } from 'lucide-react';
+import { Home } from './components/Home';
 import { searchPhilosophicalConceptWithFallback as searchPhilosophicalConcept } from './services/aiService';
 import { playSound } from './services/soundService';
 import { SettingsModal } from './components/SettingsModal';
 
 export default function App() {
-    const [currentView, setCurrentView] = useState<GameView>(GameView.LEVEL_1);
+    const [currentView, setCurrentView] = useState<GameView>(GameView.MENU);
     const [userState, setUserState] = useState<UserState>({
         score: 0,
         level1Complete: false,
@@ -68,6 +69,8 @@ export default function App() {
 
     const renderContent = () => {
         switch (currentView) {
+            case GameView.MENU:
+                return <Home onStart={(level) => setCurrentView(level === 1 ? GameView.LEVEL_1 : level === 2 ? GameView.LEVEL_2 : GameView.LEVEL_3)} />;
             case GameView.LEVEL_1:
                 return <Level1 onComplete={(s) => handleLevelComplete(1, s)} addLog={addLog} logs={logs} />;
             case GameView.LEVEL_2:
@@ -85,7 +88,7 @@ export default function App() {
         <div className="flex flex-col h-screen w-screen overflow-hidden bg-slate-950 text-slate-200 font-sans selection:bg-blue-500/30">
             {/* Top Navigation Bar */}
             <header className="h-16 border-b border-slate-800 bg-slate-900/80 backdrop-blur flex items-center justify-between px-6 z-50">
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-4 cursor-pointer hover:opacity-80 transition-opacity" onClick={() => setCurrentView(GameView.MENU)}>
                     <div className="p-2 bg-blue-600 rounded-lg shadow-lg shadow-blue-500/20">
                         <LayoutGrid className="text-white" size={24} />
                     </div>

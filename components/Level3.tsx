@@ -5,7 +5,7 @@ import { playSound } from '../services/soundService';
 import {
     Hammer, BookOpen, AlertTriangle, Play, Pause, Zap, Scale, Building2, Landmark, Leaf,
     CircleHelp, X, Bot, Sparkles, Settings, Factory, Wheat, Users, GraduationCap, Cpu,
-    Plus, Minus, Target, TreePine
+    Plus, Minus, Target, TreePine, RotateCcw, Trophy, Skull, TrendingUp
 } from 'lucide-react';
 
 interface Level3Props {
@@ -14,9 +14,9 @@ interface Level3Props {
 }
 
 const INITIAL_STATS: CityStats = {
-    material: 50,
-    consciousness: 50,
-    population: 100,
+    material: 30,
+    consciousness: 30,
+    population: 50,
     stability: 100
 };
 
@@ -56,7 +56,7 @@ const buildingNames = {
 
 export const Level3: React.FC<Level3Props> = ({ onComplete, addLog }) => {
     const [stats, setStats] = useState<CityStats>(INITIAL_STATS);
-    const [resources, setResources] = useState<Resources>({ steel: 150, food: 800, labor: 95 });
+    const [resources, setResources] = useState<Resources>({ steel: 100, food: 200, labor: 50 });
     const [isRunning, setIsRunning] = useState(false);
     const [turn, setTurn] = useState(0);
     const [activeEvent, setActiveEvent] = useState<GameEvent | null>(null);
@@ -64,10 +64,21 @@ export const Level3: React.FC<Level3Props> = ({ onComplete, addLog }) => {
     const [buildings, setBuildings] = useState<Building[]>(
         Array(GRID_SIZE * GRID_SIZE).fill(null).map(() => ({ type: 'empty' as BuildingType, name: '', level: 0 }))
     );
-    const [showHelp, setShowHelp] = useState(false);
+    const [showHelp, setShowHelp] = useState(true); // Show help on first load
     const [dialecticError, setDialecticError] = useState<string | null>(null);
     const [selectedBuildType, setSelectedBuildType] = useState<BuildingType | null>(null);
     const [zoom, setZoom] = useState(1);
+
+    // Calculate production rates for display
+    const factoryCount = buildings.filter(b => b.type === 'factory').length;
+    const farmCount = buildings.filter(b => b.type === 'farm').length;
+    const schoolCount = buildings.filter(b => b.type === 'school').length;
+    const techCount = buildings.filter(b => b.type === 'tech').length;
+
+    const steelRate = factoryCount * 8;
+    const foodRate = farmCount * 10 - Math.floor(stats.population / 50);
+    const laborRate = schoolCount * 3;
+    const popRate = (farmCount > 0) ? farmCount * 2 : 0;
 
     // Refs
     const statsRef = useRef(stats);
@@ -101,86 +112,134 @@ export const Level3: React.FC<Level3Props> = ({ onComplete, addLog }) => {
             interval = setInterval(() => tick(), 1000);
         }
         return () => clearInterval(interval);
-    }, [isRunning, activeEvent, aiAnalysis]);
+    }, [isRunning, activeEvent, aiAnalysis, buildings, stats.population, resources.food]);
 
     const tick = () => {
         setTurn(t => t + 1);
 
-        // Update resources based on buildings
-        const factoryCount = buildings.filter(b => b.type === 'factory').length;
-        const farmCount = buildings.filter(b => b.type === 'farm').length;
-        const schoolCount = buildings.filter(b => b.type === 'school').length;
-        const techCount = buildings.filter(b => b.type === 'tech').length;
+        // Count buildings
+        const factories = buildings.filter(b => b.type === 'factory').length;
+        const farms = buildings.filter(b => b.type === 'farm').length;
+        const schools = buildings.filter(b => b.type === 'school').length;
+        const techs = buildings.filter(b => b.type === 'tech').length;
 
-        setResources(prev => ({
-            steel: Math.min(999, prev.steel + factoryCount * 10 - 5),
-            food: Math.min(999, prev.food + farmCount * 15 - 10),
-            labor: Math.min(100, Math.max(0, prev.labor + schoolCount * 2 - 1))
-        }));
+        // Update resources (simple logic)
+        setResources(r => {
+            const foodConsumption = Math.floor(stats.population / 50);
+            return {
+                steel: Math.min(999, r.steel + factories * 8),
+                food: Math.min(999, Math.max(0, r.food + farms * 10 - foodConsumption)),
+                labor: Math.min(100, r.labor + schools * 3)
+            };
+        });
 
+        // Update stats (simple logic)
         setStats(prev => {
             const newStats = { ...prev };
 
-            // Production logic
-            newStats.material += (factoryCount * 2) + (techCount * 3) - (newStats.population * 0.05);
-            newStats.consciousness += (schoolCount * 3) + (techCount * 2) - (factoryCount * 0.3);
+            // Material from factories and tech
+            newStats.material = Math.min(100, newStats.material + factories * 2 + techs * 1);
 
-            // Natural decay
-            newStats.material = Math.max(0, newStats.material - 0.5);
-            newStats.consciousness = Math.max(0, newStats.consciousness - 0.5);
+            // Consciousness from schools and tech
+            newStats.consciousness = Math.min(100, newStats.consciousness + schools * 2 + techs * 2);
 
-            // Stability calculation
-            const ratio = newStats.material / (newStats.consciousness || 1);
-            let stabilityChange = 0;
-
-            if (ratio > 3.0) stabilityChange = -3;
-            else if (ratio < 0.33) stabilityChange = -3;
-            else stabilityChange = 1;
-
-            newStats.stability = Math.min(100, Math.max(0, newStats.stability + stabilityChange));
-
-            // Population Growth
-            if (newStats.stability > 60 && newStats.material > newStats.population * 0.5) {
-                newStats.population += 5;
+            // Population from farms
+            if (farms > 0 && resources.food > 0) {
+                newStats.population += farms * 2;
             }
 
-            // Game Over / Win
-            if (newStats.stability <= 0) {
-                setIsRunning(false);
-                addLog("Xã hội sụp đổ do mâu thuẫn không thể điều hòa!", 'error');
-                playSound('error');
-            }
-            if (newStats.population >= 2000) {
+            // === WIN CONDITION: Population >= 300 ===
+            if (newStats.population >= 300) {
                 setIsRunning(false);
                 onComplete(10000);
-                addLog("Chiến thắng! Xã hội đạt tới trạng thái Cộng sản chủ nghĩa.", 'success');
+                addLog('🎉 Chiến thắng! Dân số đạt 300 - Xã hội phát triển thành công!', 'success');
+                playSound('levelComplete');
             }
 
             return newStats;
         });
-
-        // Random Event
-        if (Math.random() < 0.03) triggerRandomEvent();
     };
 
     const triggerRandomEvent = () => {
         const events: GameEvent[] = [
+            // === QUY LUẬT LƯỢNG - CHẤT ===
             {
-                id: 'crisis',
-                title: 'Khủng Hoảng Thừa',
-                description: 'Hàng hóa sản xuất quá nhiều nhưng người dân không đủ tiền mua.',
+                id: 'quantity_quality',
+                title: '📚 Quy luật Lượng - Chất',
+                description: 'Số lượng nhà máy tăng đến mức gây ô nhiễm nghiêm trọng. Theo quy luật lượng-chất, sự tích lũy về lượng sẽ dẫn đến biến đổi về chất.',
                 options: [
-                    { label: 'Tiêu hủy hàng hóa', effect: () => handleStatsChange(-30, 0, -10) },
-                    { label: 'Phân phối lại', effect: () => handleStatsChange(-10, 20, 10) }
+                    { label: 'Giảm sản xuất (giữ môi trường)', effect: () => { handleStatsChange(-10, 10, 5); addLog('✅ Đáp án đúng! Cân bằng sản xuất và môi trường.', 'success'); } },
+                    { label: 'Tiếp tục sản xuất (bỏ qua)', effect: () => { handleStatsChange(5, -15, -10); addLog('❌ Sai! Tích lũy ô nhiễm sẽ gây hậu quả nghiêm trọng.', 'error'); } }
                 ]
             },
+            // === QUY LUẬT THỐNG NHẤT VÀ ĐẤU TRANH ===
             {
-                id: 'ideology',
-                title: 'Xung Đột Tư Tưởng',
-                description: 'Một trào lưu triết học mới đang thách thức các giá trị truyền thống.',
+                id: 'unity_struggle',
+                title: '⚔️ Mâu thuẫn Biện chứng',
+                description: 'Xung đột giữa công nhân và quản lý về điều kiện làm việc. Mâu thuẫn là động lực phát triển - cách giải quyết quyết định tương lai.',
                 options: [
-                    { label: 'Đàn áp tư tưởng', effect: () => handleStatsChange(0, -20, -15) },
-                    { label: 'Mở tranh luận', effect: () => handleStatsChange(0, 30, 5) }
+                    { label: 'Đối thoại, tìm điểm chung', effect: () => { handleStatsChange(5, 15, 10); setResources(r => ({ ...r, labor: Math.min(100, r.labor + 10) })); addLog('✅ Đúng! Thống nhất các mặt đối lập tạo phát triển.', 'success'); } },
+                    { label: 'Áp đặt, bỏ qua ý kiến', effect: () => { handleStatsChange(0, -10, -15); addLog('❌ Sai! Bỏ qua mâu thuẫn sẽ tích tụ và bùng nổ.', 'error'); } }
+                ]
+            },
+            // === QUY LUẬT PHỦ ĐỊNH CỦA PHỦ ĐỊNH ===
+            {
+                id: 'negation',
+                title: '🔄 Phủ định của Phủ định',
+                description: 'Công nghệ cũ đang lỗi thời. Theo quy luật phủ định của phủ định, cái mới ra đời từ cái cũ nhưng tiến bộ hơn.',
+                options: [
+                    { label: 'Kế thừa và đổi mới', effect: () => { handleStatsChange(10, 10, 5); setResources(r => ({ ...r, steel: r.steel + 30 })); addLog('✅ Đúng! Kế thừa có chọn lọc là cách phát triển đúng đắn.', 'success'); } },
+                    { label: 'Phủ nhận hoàn toàn cái cũ', effect: () => { handleStatsChange(-5, 5, -5); addLog('❌ Sai! Phủ định sạch trơn làm mất kinh nghiệm quý báu.', 'error'); } }
+                ]
+            },
+            // === VẬT CHẤT QUYẾT ĐỊNH Ý THỨC ===
+            {
+                id: 'matter_consciousness',
+                title: '💡 Vật chất và Ý thức',
+                description: 'Người dân đòi hỏi phúc lợi cao hơn nhưng nền kinh tế chưa đủ mạnh. Vật chất quyết định ý thức - nhưng ý thức có thể tác động ngược lại.',
+                options: [
+                    { label: 'Phát triển kinh tế trước', effect: () => { handleStatsChange(15, 5, 5); addLog('✅ Đúng! Cơ sở vật chất vững chắc mới đáp ứng nhu cầu.', 'success'); } },
+                    { label: 'Hứa hẹn mà không có khả năng', effect: () => { handleStatsChange(0, -10, -10); addLog('❌ Sai! Ý thức không thể tách rời thực tế vật chất.', 'error'); } }
+                ]
+            },
+            // === THỰC TIỄN LÀ TIÊU CHUẨN CHÂN LÝ ===
+            {
+                id: 'practice',
+                title: '🔬 Thực tiễn và Chân lý',
+                description: 'Một phương pháp canh tác mới được đề xuất. Theo triết học Mác, thực tiễn là tiêu chuẩn của chân lý.',
+                options: [
+                    { label: 'Thử nghiệm trước, đánh giá sau', effect: () => { handleStatsChange(5, 10, 5); setResources(r => ({ ...r, food: r.food + 50 })); addLog('✅ Đúng! Thực tiễn kiểm nghiệm tính đúng đắn của lý thuyết.', 'success'); } },
+                    { label: 'Áp dụng ngay không thử', effect: () => { handleStatsChange(-5, 0, -5); setResources(r => ({ ...r, food: Math.max(0, r.food - 30) })); addLog('❌ Sai! Thiếu thực tiễn kiểm nghiệm dễ thất bại.', 'error'); } }
+                ]
+            },
+            // === TỒN TẠI XÃ HỘI QUYẾT ĐỊNH Ý THỨC XÃ HỘI ===
+            {
+                id: 'social_being',
+                title: '🏘️ Tồn tại xã hội',
+                description: 'Điều kiện sống khó khăn làm xuất hiện tư tưởng tiêu cực. Tồn tại xã hội quyết định ý thức xã hội.',
+                options: [
+                    { label: 'Cải thiện điều kiện sống', effect: () => { handleStatsChange(10, 15, 10); addLog('✅ Đúng! Thay đổi tồn tại sẽ thay đổi ý thức.', 'success'); } },
+                    { label: 'Tuyên truyền thay đổi tư tưởng', effect: () => { handleStatsChange(0, 5, -5); addLog('❌ Thiếu hiệu quả! Chỉ tuyên truyền mà không thay đổi thực tế.', 'error'); } }
+                ]
+            },
+            // === QUAN HỆ BIỆN CHỨNG GIỮA CƠ SỞ HẠ TẦNG VÀ KIẾN TRÚC THƯỢNG TẦNG ===
+            {
+                id: 'base_superstructure',
+                title: '🏛️ Cơ sở và Kiến trúc',
+                description: 'Nền kinh tế phát triển nhưng hệ thống giáo dục lạc hậu. Kiến trúc thượng tầng cần phù hợp với cơ sở hạ tầng.',
+                options: [
+                    { label: 'Đầu tư cải cách giáo dục', effect: () => { handleStatsChange(5, 20, 10); addLog('✅ Đúng! Cập nhật kiến trúc thượng tầng theo cơ sở hạ tầng.', 'success'); } },
+                    { label: 'Giữ nguyên hệ thống cũ', effect: () => { handleStatsChange(0, -10, -5); addLog('❌ Sai! Kiến trúc thượng tầng lạc hậu kìm hãm phát triển.', 'error'); } }
+                ]
+            },
+            // === VAI TRÒ CỦA QUẦN CHÚNG NHÂN DÂN ===
+            {
+                id: 'masses',
+                title: '👥 Vai trò Quần chúng',
+                description: 'Cần quyết định hướng phát triển của thành phố. Theo quan điểm duy vật lịch sử, quần chúng là người sáng tạo lịch sử.',
+                options: [
+                    { label: 'Lấy ý kiến nhân dân', effect: () => { handleStatsChange(5, 15, 15); setStats(s => ({ ...s, population: s.population + 20 })); addLog('✅ Đúng! Phát huy sức mạnh quần chúng.', 'success'); } },
+                    { label: 'Quyết định từ trên xuống', effect: () => { handleStatsChange(5, -5, -10); addLog('❌ Thiếu hiệu quả! Bỏ qua vai trò quần chúng.', 'error'); } }
                 ]
             }
         ];
@@ -208,12 +267,12 @@ export const Level3: React.FC<Level3Props> = ({ onComplete, addLog }) => {
             return;
         }
 
-        // Check resources
+        // Check resources - NEW COSTS
         const costs: Record<BuildingType, { steel: number, food: number }> = {
-            factory: { steel: 50, food: 20 },
-            farm: { steel: 20, food: 10 },
-            school: { steel: 30, food: 30 },
-            tech: { steel: 60, food: 40 },
+            factory: { steel: 30, food: 0 },
+            farm: { steel: 20, food: 0 },
+            school: { steel: 25, food: 20 },
+            tech: { steel: 40, food: 30 },
             empty: { steel: 0, food: 0 }
         };
 
@@ -239,20 +298,40 @@ export const Level3: React.FC<Level3Props> = ({ onComplete, addLog }) => {
             food: prev.food - costs[type].food
         }));
 
-        // Stats effect
-        if (type === 'factory') handleStatsChange(15, -5, -2);
-        if (type === 'farm') handleStatsChange(10, 5, 2);
-        if (type === 'school') handleStatsChange(-5, 20, 2);
-        if (type === 'tech') handleStatsChange(10, 15, 5);
+        // Stats effect on build (instant bonus)
+        if (type === 'factory') handleStatsChange(5, 0, 0);
+        if (type === 'farm') handleStatsChange(2, 2, 2);
+        if (type === 'school') handleStatsChange(0, 5, 2);
+        if (type === 'tech') handleStatsChange(3, 4, 3);
 
         addLog(`Đã xây dựng ${name}`, 'success');
         playSound('build');
         setSelectedBuildType(null);
+
+        // Trigger event when reaching building milestones (3, 6, 9, 12)
+        const totalBuildings = buildings.filter(b => b.type !== 'empty').length + 1;
+        if (totalBuildings === 3 || totalBuildings === 6 || totalBuildings === 9 || totalBuildings === 12) {
+            setTimeout(() => triggerRandomEvent(), 500); // Delay to show building first
+        }
     };
 
     const toggleHelp = () => {
         playSound('click');
         setShowHelp(!showHelp);
+    };
+
+    const resetGame = () => {
+        playSound('click');
+        setStats(INITIAL_STATS);
+        setResources({ steel: 100, food: 200, labor: 50 });
+        setBuildings(Array(GRID_SIZE * GRID_SIZE).fill(null).map(() => ({ type: 'empty' as BuildingType, name: '', level: 0 })));
+        setTurn(0);
+        setIsRunning(false);
+        setActiveEvent(null);
+        setAiAnalysis(null);
+        setDialecticError(null);
+        setSelectedBuildType(null);
+        addLog('Đã reset game - Bắt đầu lại từ đầu!', 'info');
     };
 
     const closeAiModal = () => {
@@ -291,27 +370,37 @@ export const Level3: React.FC<Level3Props> = ({ onComplete, addLog }) => {
                     <span className="text-[10px] text-slate-500 uppercase">Học phần Duy vật Lịch sử</span>
                 </div>
 
-                {/* Resources */}
+                {/* Resources with production rates */}
                 <div className="flex items-center gap-4">
                     <div className="flex items-center gap-1.5 bg-slate-800/50 px-3 py-1 rounded border border-slate-700/50">
                         <Factory size={14} className="text-blue-400" />
                         <span className="text-xs text-slate-400">THÉP</span>
-                        <span className="text-sm font-mono font-bold text-white">{resources.steel} Tấn</span>
+                        <span className="text-sm font-mono font-bold text-white">{resources.steel}</span>
+                        {steelRate !== 0 && <span className={`text-xs font-mono ${steelRate > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                            {steelRate > 0 ? '+' : ''}{steelRate}/s
+                        </span>}
                     </div>
                     <div className="flex items-center gap-1.5 bg-slate-800/50 px-3 py-1 rounded border border-slate-700/50">
                         <Wheat size={14} className="text-amber-400" />
                         <span className="text-xs text-slate-400">LƯƠNG THỰC</span>
-                        <span className="text-sm font-mono font-bold text-white">{resources.food} Tạ</span>
+                        <span className="text-sm font-mono font-bold text-white">{resources.food}</span>
+                        {foodRate !== 0 && <span className={`text-xs font-mono ${foodRate > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                            {foodRate > 0 ? '+' : ''}{foodRate}/s
+                        </span>}
                     </div>
                     <div className="flex items-center gap-1.5 bg-slate-800/50 px-3 py-1 rounded border border-slate-700/50">
                         <Users size={14} className="text-green-400" />
-                        <span className="text-xs text-slate-400">NHÂN LỰC</span>
-                        <span className="text-sm font-mono font-bold text-white">{resources.labor}%</span>
+                        <span className="text-xs text-slate-400">DÂN SỐ</span>
+                        <span className="text-sm font-mono font-bold text-white">{stats.population}</span>
+                        {popRate > 0 && <span className="text-xs font-mono text-green-400">+{popRate}/s</span>}
                     </div>
                 </div>
 
                 {/* Controls */}
                 <div className="flex items-center gap-2">
+                    <button onClick={resetGame} className="p-2 bg-slate-800 rounded-lg border border-slate-700 text-slate-400 hover:text-orange-400 hover:border-orange-500 transition-all" title="Chơi lại">
+                        <RotateCcw size={16} />
+                    </button>
                     <button onClick={toggleHelp} className="p-2 bg-slate-800 rounded-lg border border-slate-700 text-slate-400 hover:text-white hover:border-slate-500 transition-all">
                         <Settings size={16} />
                     </button>
@@ -334,6 +423,91 @@ export const Level3: React.FC<Level3Props> = ({ onComplete, addLog }) => {
                     {/* Grid Pattern Background */}
                     <div className="absolute inset-0 opacity-10"
                         style={{ backgroundImage: 'radial-gradient(#2d5a2d 1px, transparent 1px)', backgroundSize: '30px 30px' }}>
+                    </div>
+
+                    {/* Objectives Panel - SIMPLIFIED */}
+                    <div className="absolute top-4 left-4 z-20 bg-slate-900/90 backdrop-blur border border-slate-700 rounded-lg p-4 w-64">
+                        <h4 className="text-sm font-bold text-white mb-3 flex items-center gap-2">
+                            🎯 Mục tiêu: Dân số 300
+                        </h4>
+
+                        {/* Main Progress */}
+                        <div className="mb-4">
+                            <div className="flex items-center justify-between mb-2">
+                                <span className="text-2xl font-mono font-bold text-cyan-400">{stats.population}</span>
+                                <span className="text-slate-400">/ 300</span>
+                            </div>
+                            <div className="h-3 bg-slate-800 rounded-full overflow-hidden">
+                                <div
+                                    className="h-full bg-gradient-to-r from-cyan-600 to-cyan-400 rounded-full transition-all duration-300"
+                                    style={{ width: `${Math.min(100, (stats.population / 300) * 100)}%` }}
+                                />
+                            </div>
+                            <p className="text-[10px] text-slate-500 mt-1">Xây Nông trang để tăng dân số</p>
+                        </div>
+
+                        {/* Quick Stats */}
+                        <div className="grid grid-cols-2 gap-2 text-[10px] border-t border-slate-700 pt-3">
+                            <div className="flex justify-between">
+                                <span className="text-slate-400">Vật chất:</span>
+                                <span className="text-blue-400 font-mono">{Math.floor(stats.material)}%</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span className="text-slate-400">Ý thức:</span>
+                                <span className="text-purple-400 font-mono">{Math.floor(stats.consciousness)}%</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span className="text-slate-400">Lượt:</span>
+                                <span className="text-white font-mono">{turn}</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span className="text-slate-400">Công trình:</span>
+                                <span className="text-white font-mono">{buildings.filter(b => b.type !== 'empty').length}/16</span>
+                            </div>
+                        </div>
+
+                        {/* Building Types Info */}
+                        <div className="border-t border-slate-700 pt-3 mt-3">
+                            <h5 className="text-[10px] font-bold text-slate-400 uppercase mb-2 flex items-center gap-1">
+                                🏗️ Công trình:
+                            </h5>
+                            <div className="grid grid-cols-2 gap-1.5">
+                                <div className="bg-slate-800/50 p-1.5 rounded text-[9px]">
+                                    <span className="text-green-400">🌾 Nông trang</span>
+                                    <p className="text-slate-500">+Dân số, +Lương thực</p>
+                                </div>
+                                <div className="bg-slate-800/50 p-1.5 rounded text-[9px]">
+                                    <span className="text-blue-400">🏭 Nhà máy</span>
+                                    <p className="text-slate-500">+Thép, +Vật chất</p>
+                                </div>
+                                <div className="bg-slate-800/50 p-1.5 rounded text-[9px]">
+                                    <span className="text-purple-400">🎓 Trường học</span>
+                                    <p className="text-slate-500">+Ý thức</p>
+                                </div>
+                                <div className="bg-slate-800/50 p-1.5 rounded text-[9px]">
+                                    <span className="text-cyan-400">💻 Công nghệ</span>
+                                    <p className="text-slate-500">+Vật chất, +Ý thức</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Event Milestones */}
+                        <div className="border-t border-slate-700 pt-3 mt-3">
+                            <h5 className="text-[10px] font-bold text-slate-400 uppercase mb-2">
+                                📚 Sự kiện học tập:
+                            </h5>
+                            <div className="flex gap-1">
+                                {[3, 6, 9, 12].map(milestone => {
+                                    const current = buildings.filter(b => b.type !== 'empty').length;
+                                    const completed = current >= milestone;
+                                    return (
+                                        <div key={milestone} className={`flex-1 text-center py-1 rounded text-[9px] ${completed ? 'bg-green-500/20 text-green-400' : 'bg-slate-800 text-slate-500'}`}>
+                                            {milestone} {completed && '✓'}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
                     </div>
 
                     {/* Isometric Grid */}
@@ -505,19 +679,52 @@ export const Level3: React.FC<Level3Props> = ({ onComplete, addLog }) => {
 
             {/* ===== MODALS ===== */}
 
-            {/* Help Modal */}
+            {/* Help Modal - SIMPLIFIED */}
             {showHelp && (
                 <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-                    <div className="bg-slate-900 border border-blue-500 rounded-lg max-w-md w-full p-6 shadow-2xl relative">
+                    <div className="bg-slate-900 border border-cyan-500 rounded-lg max-w-md w-full p-6 shadow-2xl relative">
                         <button onClick={toggleHelp} className="absolute top-4 right-4 text-slate-500 hover:text-white"><X size={20} /></button>
-                        <h3 className="text-xl font-display text-blue-400 mb-4 uppercase tracking-wider border-b border-slate-800 pb-2">Hướng dẫn</h3>
-                        <div className="space-y-3 text-sm text-slate-300">
-                            <p><strong className="text-white">🎯 Mục tiêu:</strong> Đạt 2000 dân số để tiến tới Cộng sản chủ nghĩa.</p>
-                            <p><strong className="text-white">🏗️ Xây dựng:</strong> Chọn loại công trình ở thanh dưới, sau đó click vào ô trống.</p>
-                            <p><strong className="text-white">⚖️ Cân bằng:</strong> Giữ tỷ lệ Vật chất/Ý thức hợp lý để tránh sụp đổ.</p>
+                        <h3 className="text-2xl font-bold text-cyan-400 mb-4">🎮 Cách chơi</h3>
+
+                        <div className="space-y-4 text-sm">
+                            <div className="bg-cyan-500/10 p-3 rounded-lg border border-cyan-500/30">
+                                <p className="text-cyan-400 font-bold">🎯 Mục tiêu: Đạt 300 dân số</p>
+                            </div>
+
+                            <div className="space-y-2">
+                                <p className="text-white font-bold">📋 Hướng dẫn:</p>
+                                <ol className="text-slate-300 space-y-2 ml-4 list-decimal">
+                                    <li>Nhấn nút <span className="text-green-400">▶ Play</span> để bắt đầu</li>
+                                    <li>Chọn công trình ở thanh dưới</li>
+                                    <li>Click vào ô trống trên bản đồ để xây</li>
+                                </ol>
+                            </div>
+
+                            <div className="space-y-2">
+                                <p className="text-white font-bold">🏗️ Công trình:</p>
+                                <div className="grid grid-cols-2 gap-2 text-xs">
+                                    <div className="bg-slate-800 p-2 rounded">
+                                        <span className="text-green-400">🌾 Nông trang</span>
+                                        <p className="text-slate-400">+Dân số, +Lương thực</p>
+                                    </div>
+                                    <div className="bg-slate-800 p-2 rounded">
+                                        <span className="text-blue-400">🏭 Nhà máy</span>
+                                        <p className="text-slate-400">+Thép, +Vật chất</p>
+                                    </div>
+                                    <div className="bg-slate-800 p-2 rounded">
+                                        <span className="text-purple-400">🎓 Trường học</span>
+                                        <p className="text-slate-400">+Ý thức</p>
+                                    </div>
+                                    <div className="bg-slate-800 p-2 rounded">
+                                        <span className="text-cyan-400">💻 Công nghệ</span>
+                                        <p className="text-slate-400">+Vật chất, +Ý thức</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <button onClick={toggleHelp} className="w-full mt-6 bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 rounded">
-                            BẮT ĐẦU
+
+                        <button onClick={toggleHelp} className="w-full mt-6 bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-3 rounded-lg text-lg">
+                            BẮT ĐẦU CHƠI!
                         </button>
                     </div>
                 </div>
