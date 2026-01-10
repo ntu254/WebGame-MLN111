@@ -7,6 +7,7 @@ import { Leaderboard } from './components/Leaderboard';
 import { LayoutGrid, Network, Map, Trophy, User, Search, Settings, ShieldAlert } from 'lucide-react';
 import { searchPhilosophicalConceptWithFallback as searchPhilosophicalConcept } from './services/aiService';
 import { playSound } from './services/soundService';
+import { SettingsModal } from './components/SettingsModal';
 
 export default function App() {
     const [currentView, setCurrentView] = useState<GameView>(GameView.LEVEL_1);
@@ -22,6 +23,7 @@ export default function App() {
     const [searchOpen, setSearchOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResult, setSearchResult] = useState('');
+    const [settingsOpen, setSettingsOpen] = useState(false);
 
     const addLog = (message: string, type: LogEntry['type']) => {
         const id = Date.now().toString() + Math.random().toString(36).substring(2, 9);
@@ -121,6 +123,9 @@ export default function App() {
                         <button onClick={() => setSearchOpen(true)} className="p-2 hover:bg-slate-800 rounded-full text-slate-400 transition-colors" title="Tra cứu">
                             <Search size={20} />
                         </button>
+                        <button onClick={() => setSettingsOpen(true)} className="p-2 hover:bg-slate-800 rounded-full text-slate-400 transition-colors" title="Cài đặt API Key">
+                            <Settings size={20} />
+                        </button>
                         <button onClick={() => setCurrentView(GameView.LEADERBOARD)} className="flex items-center gap-2 bg-gradient-to-r from-yellow-600/20 to-yellow-900/20 border border-yellow-700/50 rounded-full px-4 py-1.5 text-yellow-500 hover:border-yellow-500 transition-all">
                             <Trophy size={14} />
                             <span className="font-mono font-bold text-sm">{userState.score.toLocaleString()} XP</span>
@@ -201,6 +206,9 @@ export default function App() {
                     </div>
                 </div>
             )}
+
+            {/* Settings Modal */}
+            <SettingsModal isOpen={settingsOpen} onClose={() => setSettingsOpen(false)} />
         </div>
     );
 }

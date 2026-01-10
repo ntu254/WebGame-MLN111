@@ -1,16 +1,20 @@
 import { GoogleGenAI, Type } from "@google/genai";
+import { getGeminiApiKey } from "./apiKeyService";
 
-const apiKey = process.env.API_KEY || ''; // In a real app, handle missing key gracefully
-const ai = new GoogleGenAI({ apiKey });
+// Create AI instance dynamically with current API key
+const getAIInstance = () => {
+  const apiKey = getGeminiApiKey();
+  return new GoogleGenAI({ apiKey });
+};
 
 // Helper to check for API key
-const hasKey = () => !!apiKey;
+const hasKey = () => !!getGeminiApiKey();
 
 export const checkClassificationWithAI = async (item: string, userChoice: string): Promise<string> => {
   if (!hasKey()) return "Hệ thống AI đang ngoại tuyến. (Thiếu API Key)";
 
   try {
-    const response = await ai.models.generateContent({
+    const response = await getAIInstance().models.generateContent({
       model: 'gemini-3-flash-preview',
       contents: `User classified "${item}" as "${userChoice}". In the context of Marxist-Leninist philosophy (Materialism vs Idealism), is this correct? Explain briefly in 1 sentence in Vietnamese.`,
     });
@@ -31,7 +35,7 @@ export const generateSkillNodeQuestion = async (nodeName: string): Promise<{ que
   }
 
   try {
-    const response = await ai.models.generateContent({
+    const response = await getAIInstance().models.generateContent({
       model: 'gemini-3-flash-preview',
       contents: `Generate a multiple-choice question in Vietnamese about the origin of consciousness related to "${nodeName}" based on Engels' or Marxist theory. Return JSON.`,
       config: {
@@ -46,16 +50,16 @@ export const generateSkillNodeQuestion = async (nodeName: string): Promise<{ que
         }
       }
     });
-    
+
     const jsonStr = response.text;
     if (!jsonStr) throw new Error("Empty response");
     return JSON.parse(jsonStr);
   } catch (error) {
     console.error("AI Quiz Gen Error", error);
     return {
-       question: `Lỗi tạo câu hỏi cho ${nodeName}. Vui lòng thử lại.`,
-       options: ["Thử lại"],
-       correctAnswerIndex: 0
+      question: `Lỗi tạo câu hỏi cho ${nodeName}. Vui lòng thử lại.`,
+      options: ["Thử lại"],
+      correctAnswerIndex: 0
     };
   }
 };
@@ -64,7 +68,7 @@ export const consultDialecticAdvisor = async (stats: { material: number, conscio
   if (!hasKey()) return "Cố vấn: Cần cân bằng giữa cơ sở hạ tầng và kiến trúc thượng tầng.";
 
   try {
-    const response = await ai.models.generateContent({
+    const response = await getAIInstance().models.generateContent({
       model: 'gemini-3-flash-preview',
       contents: `Current stats: Material Conditions (Basis): ${stats.material}, Social Consciousness (Superstructure): ${stats.consciousness}. 
       Analyze the dialectical relationship. If Material >> Consciousness, warn about "Vulgar Materialism" or lack of culture. 
@@ -79,49 +83,49 @@ export const consultDialecticAdvisor = async (stats: { material: number, conscio
 };
 
 export const generateEventOutcome = async (eventName: string, choice: string): Promise<string> => {
-    if (!hasKey()) return "Hệ thống ghi nhận quyết định của bạn.";
+  if (!hasKey()) return "Hệ thống ghi nhận quyết định của bạn.";
 
-    try {
-        const response = await ai.models.generateContent({
-            model: 'gemini-3-flash-preview',
-            contents: `In a society simulation game based on Dialectical Materialism.
+  try {
+    const response = await getAIInstance().models.generateContent({
+      model: 'gemini-3-flash-preview',
+      contents: `In a society simulation game based on Dialectical Materialism.
             Event: "${eventName}" occurred.
             Player Choice: "${choice}".
             Generate a 1-sentence outcome describing how society changes based on this choice in Vietnamese.`,
-        });
-        return response.text || "Quyết định đã được thực thi.";
-    } catch (e) {
-        return "Lỗi xử lý sự kiện.";
-    }
+    });
+    return response.text || "Quyết định đã được thực thi.";
+  } catch (e) {
+    return "Lỗi xử lý sự kiện.";
+  }
 }
 
 export const searchPhilosophicalConcept = async (query: string): Promise<string> => {
-    if (!hasKey()) return "Tính năng tìm kiếm cần API Key.";
+  if (!hasKey()) return "Tính năng tìm kiếm cần API Key.";
 
-    try {
-        const response = await ai.models.generateContent({
-            model: "gemini-3-flash-preview", // Using flash with tools as requested
-            contents: `Explain "${query}" briefly in the context of Marxist philosophy in Vietnamese. Find a real-world example.`,
-            config: {
-                tools: [{ googleSearch: {} }]
-            }
-        });
-        
-        let text = response.text || "";
-        
-        // Extract sources if available
-        const chunks = response.candidates?.[0]?.groundingMetadata?.groundingChunks;
-        if (chunks) {
-            const links = chunks
-                .map((c: any) => c.web?.uri ? `[${c.web.title}](${c.web.uri})` : null)
-                .filter(Boolean)
-                .join(', ');
-            if (links) text += `\n\nNguồn tham khảo: ${links}`;
-        }
-        
-        return text;
-    } catch (e) {
-        console.error(e);
-        return "Không thể tìm kiếm thông tin lúc này.";
+  try {
+    const response = await getAIInstance().models.generateContent({
+      model: "gemini-3-flash-preview", // Using flash with tools as requested
+      contents: `Explain "${query}" briefly in the context of Marxist philosophy in Vietnamese. Find a real-world example.`,
+      config: {
+        tools: [{ googleSearch: {} }]
+      }
+    });
+
+    let text = response.text || "";
+
+    // Extract sources if available
+    const chunks = response.candidates?.[0]?.groundingMetadata?.groundingChunks;
+    if (chunks) {
+      const links = chunks
+        .map((c: any) => c.web?.uri ? `[${c.web.title}](${c.web.uri})` : null)
+        .filter(Boolean)
+        .join(', ');
+      if (links) text += `\n\nNguồn tham khảo: ${links}`;
     }
+
+    return text;
+  } catch (e) {
+    console.error(e);
+    return "Không thể tìm kiếm thông tin lúc này.";
+  }
 }
