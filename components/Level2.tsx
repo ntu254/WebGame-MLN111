@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { SkillNode, LogEntry } from '../types';
-import { generateSkillNodeQuestion } from '../services/openRouterService';
+import { generateSkillNodeQuestionWithFallback as generateSkillNodeQuestion } from '../services/aiService';
 import { playSound } from '../services/soundService';
 import { Brain, Pickaxe, Eye, Microscope, Lock, CheckCircle, Unlock, CircleHelp, X } from 'lucide-react';
 

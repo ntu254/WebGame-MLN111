@@ -5,7 +5,7 @@ import { Level2 } from './components/Level2';
 import { Level3 } from './components/Level3';
 import { Leaderboard } from './components/Leaderboard';
 import { LayoutGrid, Network, Map, Trophy, User, Search, Settings, ShieldAlert } from 'lucide-react';
-import { searchPhilosophicalConceptOpenRouter as searchPhilosophicalConcept } from './services/openRouterService';
+import { searchPhilosophicalConceptWithFallback as searchPhilosophicalConcept } from './services/aiService';
 import { playSound } from './services/soundService';
 
 export default function App() {
