@@ -591,22 +591,22 @@ export const Level3: React.FC<Level3Props> = ({ onComplete, addLog }) => {
                     <p className="text-[10px] text-slate-600 mt-1">Năng lực sản xuất giới hạn sự mở rộng tư tưởng.</p>
                 </div>
 
-                {/* Center: Build Actions - Horizontal Scroll on Mobile */}
-                <div className="w-full md:flex-1 flex items-center justify-start md:justify-center gap-2 overflow-x-auto no-scrollbar pb-2 md:pb-0">
+                {/* Center: Build Actions - Grid on Mobile to avoid scroll */}
+                <div className="w-full md:flex-1 grid grid-cols-4 gap-1 md:gap-2 md:flex md:items-center md:justify-center">
                     <span className="text-[10px] text-slate-500 uppercase font-bold mr-2 shrink-0 hidden md:block">Xây dựng</span>
 
                     {[
-                        { type: 'farm' as BuildingType, icon: <Wheat size={20} />, label: 'NÔNG NGHIỆP', color: 'green' },
-                        { type: 'factory' as BuildingType, icon: <Factory size={20} />, label: 'NHÀ MÁY', color: 'blue' },
-                        { type: 'school' as BuildingType, icon: <GraduationCap size={20} />, label: 'TRƯỜNG HỌC', color: 'purple' },
-                        { type: 'tech' as BuildingType, icon: <Cpu size={20} />, label: 'CÔNG NGHỆ', color: 'cyan' },
+                        { type: 'farm' as BuildingType, icon: <Wheat size={16} className="md:w-5 md:h-5" />, label: 'NÔNG TRẠI', color: 'green' },
+                        { type: 'factory' as BuildingType, icon: <Factory size={16} className="md:w-5 md:h-5" />, label: 'NHÀ MÁY', color: 'blue' },
+                        { type: 'school' as BuildingType, icon: <GraduationCap size={16} className="md:w-5 md:h-5" />, label: 'TRƯỜNG', color: 'purple' },
+                        { type: 'tech' as BuildingType, icon: <Cpu size={16} className="md:w-5 md:h-5" />, label: 'CÔNG NGHỆ', color: 'cyan' },
                     ].map(item => (
                         <button
                             key={item.type}
                             onClick={() => setSelectedBuildType(selectedBuildType === item.type ? null : item.type)}
                             disabled={!isRunning}
                             className={`
-                flex md:flex-col items-center gap-2 md:gap-1 px-4 py-2 md:py-2 rounded-lg border transition-all shrink-0
+                flex flex-col items-center justify-center gap-1 px-1 py-2 rounded-lg border transition-all h-full
                 ${selectedBuildType === item.type
                                     ? `bg-${item.color}-500/20 border-${item.color}-500 text-${item.color}-400`
                                     : 'bg-slate-800/50 border-slate-700 text-slate-400 hover:border-slate-500 hover:text-white'}
@@ -614,7 +614,7 @@ export const Level3: React.FC<Level3Props> = ({ onComplete, addLog }) => {
               `}
                         >
                             {item.icon}
-                            <span className="text-[10px] md:text-[9px] font-bold uppercase">{item.label}</span>
+                            <span className="text-[9px] font-bold uppercase truncate w-full text-center">{item.label}</span>
                         </button>
                     ))}
                 </div>
