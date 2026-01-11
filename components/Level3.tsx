@@ -5,7 +5,7 @@ import { playSound } from '../services/soundService';
 import {
     Hammer, BookOpen, AlertTriangle, Play, Pause, Zap, Scale, Building2, Landmark, Leaf,
     CircleHelp, X, Bot, Sparkles, Settings, Factory, Wheat, Users, GraduationCap, Cpu,
-    Plus, Minus, Target, TreePine, RotateCcw, Trophy, Skull, TrendingUp
+    Plus, Minus, Target, TreePine, RotateCcw, Trophy, Skull, TrendingUp, ArrowRight
 } from 'lucide-react';
 
 interface Level3Props {
@@ -66,6 +66,7 @@ export const Level3: React.FC<Level3Props> = ({ onComplete, addLog }) => {
     );
     const [showHelp, setShowHelp] = useState(true); // Show help on first load
     const [showSummary, setShowSummary] = useState(false); // Mobile summary panel toggle
+    const [completionMessage, setCompletionMessage] = useState<string | null>(null);
     const [dialecticError, setDialecticError] = useState<string | null>(null);
     const [selectedBuildType, setSelectedBuildType] = useState<BuildingType | null>(null);
     const [zoom, setZoom] = useState(1);
@@ -152,9 +153,21 @@ export const Level3: React.FC<Level3Props> = ({ onComplete, addLog }) => {
             // === WIN CONDITION: Population >= 300 ===
             if (newStats.population >= 300) {
                 setIsRunning(false);
-                onComplete(10000);
-                addLog('🎉 Chiến thắng! Dân số đạt 300 - Xã hội phát triển thành công!', 'success');
                 playSound('levelComplete');
+
+                // Generate Dialectic Advice based on final stats
+                let advice = "";
+                const ratio = newStats.material / (newStats.consciousness || 1);
+
+                if (ratio > 1.5) {
+                    advice = "Xã hội của bạn có nền tảng vật chất vững chắc, nhưng đời sống tinh thần còn chưa theo kịp. Hãy nhớ: 'Vật chất quyết định ý thức', nhưng ý thức cũng có tính độc lập tương đối và tác động ngược lại. Cần đầu tư thêm cho văn hóa và giáo dục để xã hội phát triển bền vững.";
+                } else if (ratio < 0.7) {
+                    advice = "Xã hội của bạn rất chú trọng tư tưởng, nhưng cơ sở vật chất còn yếu. Cảnh giác với bệnh 'chủ quan duy ý chí'. Không có bột sao gột nên hồ? Cần đẩy mạnh sản xuất để hiện thực hóa các lý tưởng cao đẹp.";
+                } else {
+                    advice = "Tuyệt vời! Bạn đã đạt được sự cân bằng biện chứng giữa cơ sở vật chất và kiến trúc thượng tầng. Đây là hình mẫu lý tưởng của một xã hội phát triển hài hòa, nơi kinh tế và văn hóa thúc đẩy lẫn nhau.";
+                }
+
+                setCompletionMessage(advice);
             }
 
             return newStats;
@@ -440,8 +453,8 @@ export const Level3: React.FC<Level3Props> = ({ onComplete, addLog }) => {
 
                         <div className={`
                             bg-slate-900/90 backdrop-blur border border-slate-700 rounded-lg p-4 w-64 pointer-events-auto transition-all origin-top-left
-                            ${window.innerWidth < 768 ? 'hidden' : 'block'} 
-                            md:block
+                            ${showSummary ? 'scale-100 opacity-100' : 'scale-95 opacity-0 pointer-events-none absolute'} 
+                            md:relative md:scale-100 md:opacity-100 md:pointer-events-auto md:block
                         `}>
                             {/* Render panel content always for desktop, handled differently for mobile if needed. 
                                 For simplicity, let's just make it visible on desktop and hidden on mobile unless toggled? 
@@ -714,6 +727,42 @@ export const Level3: React.FC<Level3Props> = ({ onComplete, addLog }) => {
                         >
                             Tiếp nhận thông tin
                         </button>
+                    </div>
+                </div>
+            )}
+            {/* Completion Modal */}
+            {completionMessage && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-500">
+                    <div className="bg-slate-900 border-2 border-green-500 rounded-2xl w-full max-w-lg p-8 shadow-2xl relative overflow-hidden">
+                        {/* Background Deco */}
+                        <div className="absolute top-0 right-0 p-32 bg-green-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+                        <div className="relative z-10 text-center space-y-6">
+                            <div className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto ring-4 ring-green-500/10 mb-4 animate-[bounce_2s_infinite]">
+                                <Trophy size={40} className="text-green-400" />
+                            </div>
+
+                            <h2 className="text-3xl font-display font-bold text-white uppercase tracking-wider">
+                                Sứ Mệnh Hoàn Thành!
+                            </h2>
+
+                            <div className="bg-slate-800/50 p-6 rounded-xl border border-slate-700 text-left space-y-4">
+                                <h3 className="text-lg font-bold text-green-400 flex items-center gap-2">
+                                    <Sparkles size={18} />
+                                    Lời Khuyên Từ Cỗ Máy Biện Chứng:
+                                </h3>
+                                <p className="text-slate-300 leading-relaxed italic border-l-4 border-green-500 pl-4 py-1">
+                                    "{completionMessage}"
+                                </p>
+                            </div>
+
+                            <button
+                                onClick={() => onComplete(10000)}
+                                className="w-full bg-yellow-600 hover:bg-yellow-500 text-white font-bold py-4 rounded-xl transition-all shadow-lg hover:shadow-yellow-500/25 flex items-center justify-center gap-2 mt-4"
+                            >
+                                XEM BẢNG XẾP HẠNG <Trophy size={20} />
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}

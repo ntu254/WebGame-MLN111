@@ -64,6 +64,8 @@ export default function App() {
             setTimeout(() => setCurrentView(GameView.LEVEL_2), 500); // Small delay for effect
         } else if (level === 2) {
             setTimeout(() => setCurrentView(GameView.LEVEL_3), 500);
+        } else if (level === 3) {
+            setTimeout(() => setCurrentView(GameView.LEADERBOARD), 500);
         }
     };
 
