@@ -108,10 +108,10 @@ export const Level2: React.FC<Level2Props> = ({ onComplete, addLog }) => {
         <div className="relative w-full h-full bg-slate-950 p-6 overflow-hidden">
             <div className="absolute top-6 left-6 z-10 flex gap-4 items-start">
                 <div>
-                    <h2 className="text-2xl font-display text-white">Cấp độ 2: Cây Ý Thức</h2>
-                    <p className="text-slate-400 text-sm">Mở khóa các nút để hiểu về nguồn gốc tư duy con người.</p>
+                    <h2 className="text-xl md:text-2xl font-display text-white">Cấp độ 2: Cây Ý Thức</h2>
+                    <p className="text-slate-400 text-xs md:text-sm hidden md:block">Mở khóa các nút để hiểu về nguồn gốc tư duy con người.</p>
                 </div>
-                <button onClick={toggleHelp} className="p-2 bg-slate-800 border border-slate-600 rounded-full text-slate-400 hover:text-white hover:border-blue-500 transition-all" title="Hướng dẫn">
+                <button onClick={toggleHelp} className="p-2 bg-slate-800 border border-slate-600 rounded-full text-slate-400 hover:text-white hover:border-blue-500 transition-all z-50" title="Hướng dẫn">
                     <CircleHelp size={20} />
                 </button>
             </div>
@@ -119,7 +119,7 @@ export const Level2: React.FC<Level2Props> = ({ onComplete, addLog }) => {
             {/* Help Modal */}
             {showHelp && (
                 <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-                    <div className="bg-slate-900 border border-blue-500 rounded-lg max-w-md w-full p-6 shadow-2xl relative">
+                    <div className="bg-slate-900 border border-blue-500 rounded-lg max-w-md w-full p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
                         <button onClick={toggleHelp} className="absolute top-4 right-4 text-slate-500 hover:text-white"><X size={20} /></button>
                         <h3 className="text-xl font-display text-blue-400 mb-4 uppercase tracking-wider border-b border-slate-800 pb-2">Hệ thống Kích hoạt Noron</h3>
                         <div className="space-y-4 text-sm text-slate-300">
@@ -150,7 +150,7 @@ export const Level2: React.FC<Level2Props> = ({ onComplete, addLog }) => {
             )}
 
             {/* Drawing Area */}
-            <div className="w-full h-full relative flex items-center justify-center">
+            <div className="w-full h-full relative flex items-center justify-center touch-manipulation">
                 <svg className="absolute inset-0 w-full h-full pointer-events-none">
                     {nodes.map(node => {
                         return node.parents.map(parentId => {
@@ -177,7 +177,7 @@ export const Level2: React.FC<Level2Props> = ({ onComplete, addLog }) => {
                         key={node.id}
                         onClick={() => handleNodeClick(node)}
                         className={`
-                    absolute transform -translate-x-1/2 -translate-y-1/2 w-20 h-20 rounded-full border-2 flex flex-col items-center justify-center cursor-pointer transition-all duration-300
+                    absolute transform -translate-x-1/2 -translate-y-1/2 w-14 h-14 md:w-20 md:h-20 rounded-full border-2 flex flex-col items-center justify-center cursor-pointer transition-all duration-300
                     hover:scale-110 z-20
                     ${node.status === 'locked' ? 'bg-slate-900 border-slate-700 text-slate-600 grayscale' :
                                 node.status === 'completed' ? 'bg-blue-900/50 border-green-400 text-green-400 shadow-[0_0_20px_rgba(74,222,128,0.3)]' :
@@ -185,8 +185,8 @@ export const Level2: React.FC<Level2Props> = ({ onComplete, addLog }) => {
                 `}
                         style={{ left: `${node.x}%`, top: `${node.y}%` }}
                     >
-                        {node.status === 'locked' ? <Lock size={20} /> : node.status === 'completed' ? <CheckCircle size={24} /> : getNodeIcon(node.id)}
-                        <span className="mt-1 text-[10px] font-bold tracking-wider bg-slate-950/80 px-2 rounded text-center">{node.label}</span>
+                        {node.status === 'locked' ? <Lock size={16} className="md:w-5 md:h-5" /> : node.status === 'completed' ? <CheckCircle size={20} className="md:w-6 md:h-6" /> : React.cloneElement(getNodeIcon(node.id) as React.ReactElement, { size: 20 })}
+                        <span className="mt-1 text-[8px] md:text-[10px] font-bold tracking-wider bg-slate-950/80 px-1 md:px-2 rounded text-center whitespace-nowrap">{node.label}</span>
                     </div>
                 ))}
             </div>

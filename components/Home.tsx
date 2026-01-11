@@ -148,6 +148,52 @@ export const Home: React.FC<HomeProps> = ({ onStart }) => {
                     </div>
                 </div>
 
+                {/* AI Appendix Section */}
+                <div className="mt-16 p-8 bg-gradient-to-br from-slate-900 to-slate-900/50 rounded-2xl border border-slate-800 relative overflow-hidden">
+                    <div className="absolute top-0 right-0 p-32 bg-blue-500/5 rounded-full blur-3xl pointer-events-none"></div>
+
+                    <div className="relative z-10">
+                        <div className="flex items-center gap-3 mb-6">
+                            <div className="p-2 bg-blue-500/20 rounded-lg">
+                                <Brain size={24} className="text-blue-400" />
+                            </div>
+                            <h3 className="text-xl font-display font-bold text-white uppercase tracking-wider">Phụ Lục: Trí Tuệ Nhân Tạo Trong Hệ Thống</h3>
+                        </div>
+
+                        <div className="grid md:grid-cols-3 gap-8">
+                            <div className="space-y-3">
+                                <h4 className="text-blue-300 font-bold flex items-center gap-2">
+                                    <span className="w-1.5 h-1.5 bg-blue-400 rounded-full"></span>
+                                    Tra Cứu Khái Niệm
+                                </h4>
+                                <p className="text-slate-400 text-sm leading-relaxed text-justify">
+                                    Sử dụng <strong>LLM (Large Language Models)</strong> để phân tích và giải thích các khái niệm triết học trừu tượng một cách dễ hiểu, chính xác theo ngữ cảnh câu hỏi của người học.
+                                </p>
+                            </div>
+
+                            <div className="space-y-3">
+                                <h4 className="text-purple-300 font-bold flex items-center gap-2">
+                                    <span className="w-1.5 h-1.5 bg-purple-400 rounded-full"></span>
+                                    Cố Vấn Chiến Lược (Level 3)
+                                </h4>
+                                <p className="text-slate-400 text-sm leading-relaxed text-justify">
+                                    AI đóng vai trò là "Cố vấn ảo", phân tích các chỉ số Sinh học, Kinh tế, Văn hóa của xã hội người chơi xây dựng để đưa ra lời khuyên phát triển cân bằng.
+                                </p>
+                            </div>
+
+                            <div className="space-y-3">
+                                <h4 className="text-green-300 font-bold flex items-center gap-2">
+                                    <span className="w-1.5 h-1.5 bg-green-400 rounded-full"></span>
+                                    Hệ Thống Phản Hồi
+                                </h4>
+                                <p className="text-slate-400 text-sm leading-relaxed text-justify">
+                                    Tự động đánh giá câu trả lời của người học, cung cấp phản hồi chi tiết về lý do đúng/sai dựa trên các nguyên lý của Chủ nghĩa Duy vật Biện chứng.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div className="text-center pt-8 text-slate-600 text-xs font-mono">
                     <p>Dự án mã nguồn mở phục vụ cộng đồng sinh viên Việt Nam</p>
                     <p>© 2024 Cỗ Máy Biện Chứng. All rights reserved.</p>

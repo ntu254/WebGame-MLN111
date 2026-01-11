@@ -4,7 +4,7 @@ import { Level1 } from './components/Level1';
 import { Level2 } from './components/Level2';
 import { Level3 } from './components/Level3';
 import { Leaderboard } from './components/Leaderboard';
-import { LayoutGrid, Network, Map, Trophy, User, Search, Settings, ShieldAlert, Home as HomeIcon } from 'lucide-react';
+import { LayoutGrid, Network, Map, Trophy, User, Search, Settings, ShieldAlert, Home as HomeIcon, Menu, X } from 'lucide-react';
 import { Home } from './components/Home';
 import { searchPhilosophicalConceptWithFallback as searchPhilosophicalConcept } from './services/aiService';
 import { playSound } from './services/soundService';
@@ -25,6 +25,7 @@ export default function App() {
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResult, setSearchResult] = useState('');
     const [settingsOpen, setSettingsOpen] = useState(false);
+    const [menuOpen, setMenuOpen] = useState(false);
 
     const addLog = (message: string, type: LogEntry['type']) => {
         const id = Date.now().toString() + Math.random().toString(36).substring(2, 9);
@@ -57,6 +58,13 @@ export default function App() {
             level3Complete: level === 3 ? true : prev.level3Complete,
         }));
         addLog(`Cấp độ ${level} hoàn thành. +${scoreToAdd} XP`, 'success');
+
+        // Auto-navigate to next level
+        if (level === 1) {
+            setTimeout(() => setCurrentView(GameView.LEVEL_2), 500); // Small delay for effect
+        } else if (level === 2) {
+            setTimeout(() => setCurrentView(GameView.LEVEL_3), 500);
+        }
     };
 
     const handleSearch = async (e: React.FormEvent) => {
@@ -70,7 +78,7 @@ export default function App() {
     const renderContent = () => {
         switch (currentView) {
             case GameView.MENU:
-                return <Home onStart={(level) => setCurrentView(level === 1 ? GameView.LEVEL_1 : level === 2 ? GameView.LEVEL_2 : GameView.LEVEL_3)} />;
+                return <Home onStart={(level) => { setCurrentView(level === 1 ? GameView.LEVEL_1 : level === 2 ? GameView.LEVEL_2 : GameView.LEVEL_3); setMenuOpen(false); }} />;
             case GameView.LEVEL_1:
                 return <Level1 onComplete={(s) => handleLevelComplete(1, s)} addLog={addLog} logs={logs} />;
             case GameView.LEVEL_2:
@@ -87,20 +95,22 @@ export default function App() {
     return (
         <div className="flex flex-col h-screen w-screen overflow-hidden bg-slate-950 text-slate-200 font-sans selection:bg-blue-500/30">
             {/* Top Navigation Bar */}
-            <header className="h-16 border-b border-slate-800 bg-slate-900/80 backdrop-blur flex items-center justify-between px-6 z-50">
+            <header className="h-16 border-b border-slate-800 bg-slate-900/80 backdrop-blur flex items-center justify-between px-6 z-50 relative">
                 <div className="flex items-center gap-4 cursor-pointer hover:opacity-80 transition-opacity" onClick={() => setCurrentView(GameView.MENU)}>
                     <div className="p-2 bg-blue-600 rounded-lg shadow-lg shadow-blue-500/20">
                         <LayoutGrid className="text-white" size={24} />
                     </div>
                     <div>
-                        <h1 className="font-display font-bold text-white text-lg tracking-wide">CỖ MÁY BIỆN CHỨNG <span className="text-xs text-blue-400 font-mono">v1.0</span></h1>
+                        <h1 className="font-display font-bold text-white text-lg tracking-wide hidden md:block">CỖ MÁY BIỆN CHỨNG <span className="text-xs text-blue-400 font-mono">v1.0</span></h1>
+                        <h1 className="font-display font-bold text-white text-lg tracking-wide md:hidden">CMBC <span className="text-xs text-blue-400 font-mono">v1</span></h1>
                         <div className="flex items-center gap-2 text-[10px] uppercase text-slate-500 font-bold tracking-widest">
                             Trạng thái: <span className="text-green-400">Trực tuyến</span>
                         </div>
                     </div>
                 </div>
 
-                <div className="flex items-center gap-8">
+                <div className="flex items-center gap-4">
+                    {/* Desktop Navigation */}
                     <div className="hidden md:flex gap-1 bg-slate-800 p-1 rounded-lg">
                         <button
                             onClick={() => setCurrentView(GameView.LEVEL_1)}
@@ -122,22 +132,52 @@ export default function App() {
                         </button>
                     </div>
 
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2 md:gap-4">
                         <button onClick={() => setSearchOpen(true)} className="p-2 hover:bg-slate-800 rounded-full text-slate-400 transition-colors" title="Tra cứu">
                             <Search size={20} />
                         </button>
                         <button onClick={() => setSettingsOpen(true)} className="p-2 hover:bg-slate-800 rounded-full text-slate-400 transition-colors" title="Cài đặt API Key">
                             <Settings size={20} />
                         </button>
-                        <button onClick={() => setCurrentView(GameView.LEADERBOARD)} className="flex items-center gap-2 bg-gradient-to-r from-yellow-600/20 to-yellow-900/20 border border-yellow-700/50 rounded-full px-4 py-1.5 text-yellow-500 hover:border-yellow-500 transition-all">
+                        <button onClick={() => setCurrentView(GameView.LEADERBOARD)} className="hidden md:flex items-center gap-2 bg-gradient-to-r from-yellow-600/20 to-yellow-900/20 border border-yellow-700/50 rounded-full px-4 py-1.5 text-yellow-500 hover:border-yellow-500 transition-all">
                             <Trophy size={14} />
                             <span className="font-mono font-bold text-sm">{userState.score.toLocaleString()} XP</span>
                         </button>
-                        <div className="w-10 h-10 rounded-full bg-slate-800 border-2 border-slate-700 flex items-center justify-center">
-                            <User size={20} className="text-slate-400" />
-                        </div>
+
+                        {/* Mobile Menu Toggle */}
+                        <button onClick={() => setMenuOpen(!menuOpen)} className="md:hidden p-2 hover:bg-slate-800 rounded-lg text-white transition-colors">
+                            {menuOpen ? <X size={24} /> : <Menu size={24} />}
+                        </button>
                     </div>
                 </div>
+
+                {/* Mobile Menu Dropdown */}
+                {menuOpen && (
+                    <div className="absolute top-16 left-0 w-full bg-slate-900/95 backdrop-blur-md border-b border-slate-800 p-4 flex flex-col gap-2 shadow-2xl animate-in slide-in-from-top-2 md:hidden">
+                        <button
+                            onClick={() => { setCurrentView(GameView.LEVEL_1); setMenuOpen(false); }}
+                            className={`p-4 rounded-xl font-bold transition-all flex items-center gap-3 ${currentView === GameView.LEVEL_1 ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-300'}`}
+                        >
+                            <LayoutGrid size={20} /> Module 1: Vật Chất
+                        </button>
+                        <button
+                            onClick={() => { setCurrentView(GameView.LEVEL_2); setMenuOpen(false); }}
+                            className={`p-4 rounded-xl font-bold transition-all flex items-center gap-3 ${currentView === GameView.LEVEL_2 ? 'bg-purple-600 text-white' : 'bg-slate-800 text-slate-300'}`}
+                        >
+                            <Network size={20} /> Module 2: Ý Thức
+                        </button>
+                        <button
+                            onClick={() => { setCurrentView(GameView.LEVEL_3); setMenuOpen(false); }}
+                            className={`p-4 rounded-xl font-bold transition-all flex items-center gap-3 ${currentView === GameView.LEVEL_3 ? 'bg-green-600 text-white' : 'bg-slate-800 text-slate-300'}`}
+                        >
+                            <Map size={20} /> Module 3: Biện Chứng
+                        </button>
+                        <button onClick={() => { setCurrentView(GameView.LEADERBOARD); setMenuOpen(false); }} className="p-4 rounded-xl bg-slate-800 text-yellow-500 font-bold flex items-center gap-3 border border-slate-700">
+                            <Trophy size={20} />
+                            Bảng Xếp Hạng ({userState.score} XP)
+                        </button>
+                    </div>
+                )}
             </header>
 
             {/* Main Content Area */}

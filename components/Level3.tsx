@@ -65,6 +65,7 @@ export const Level3: React.FC<Level3Props> = ({ onComplete, addLog }) => {
         Array(GRID_SIZE * GRID_SIZE).fill(null).map(() => ({ type: 'empty' as BuildingType, name: '', level: 0 }))
     );
     const [showHelp, setShowHelp] = useState(true); // Show help on first load
+    const [showSummary, setShowSummary] = useState(false); // Mobile summary panel toggle
     const [dialecticError, setDialecticError] = useState<string | null>(null);
     const [selectedBuildType, setSelectedBuildType] = useState<BuildingType | null>(null);
     const [zoom, setZoom] = useState(1);
@@ -360,49 +361,49 @@ export const Level3: React.FC<Level3Props> = ({ onComplete, addLog }) => {
         <div className="h-full flex flex-col bg-gradient-to-b from-slate-900 via-slate-950 to-slate-900 overflow-hidden relative">
 
             {/* ===== TOP BAR ===== */}
-            <header className="h-14 bg-slate-900/90 backdrop-blur border-b border-slate-700/50 flex items-center justify-between px-4 z-30">
-                <div className="flex items-center gap-3">
-                    <div className="flex items-center gap-2 bg-blue-500/10 px-3 py-1.5 rounded-full border border-blue-500/30">
+            <header className="h-14 bg-slate-900/90 backdrop-blur border-b border-slate-700/50 flex items-center justify-between px-2 md:px-4 z-30 shrink-0">
+                <div className="flex items-center gap-2 md:gap-3 shrink-0">
+                    <div className="flex items-center gap-2 bg-blue-500/10 px-2 md:px-3 py-1.5 rounded-full border border-blue-500/30">
                         <Zap size={14} className="text-blue-400" />
-                        <span className="text-xs font-bold text-slate-300">CẤP ĐỘ 3:</span>
-                        <span className="text-xs font-bold text-blue-400 uppercase">Mô Phỏng Xã Hội Biện Chứng</span>
+                        <span className="text-xs font-bold text-slate-300 hidden md:inline">CẤP ĐỘ 3:</span>
+                        <span className="text-xs font-bold text-blue-400 uppercase hidden md:inline">Mô Phỏng Xã Hội Biện Chứng</span>
+                        <span className="text-xs font-bold text-blue-400 uppercase md:hidden">Lvl 3</span>
                     </div>
-                    <span className="text-[10px] text-slate-500 uppercase">Học phần Duy vật Lịch sử</span>
                 </div>
 
-                {/* Resources with production rates */}
-                <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-1.5 bg-slate-800/50 px-3 py-1 rounded border border-slate-700/50">
+                {/* Resources with production rates - Scrollable on mobile */}
+                <div className="flex items-center gap-2 md:gap-4 overflow-x-auto no-scrollbar mx-2">
+                    <div className="flex items-center gap-1.5 bg-slate-800/50 px-2 md:px-3 py-1 rounded border border-slate-700/50 shrink-0">
                         <Factory size={14} className="text-blue-400" />
-                        <span className="text-xs text-slate-400">THÉP</span>
+                        <span className="text-xs text-slate-400 hidden md:invoke">THÉP</span>
                         <span className="text-sm font-mono font-bold text-white">{resources.steel}</span>
-                        {steelRate !== 0 && <span className={`text-xs font-mono ${steelRate > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                        {steelRate !== 0 && <span className={`text-[10px] md:text-xs font-mono ${steelRate > 0 ? 'text-green-400' : 'text-red-400'}`}>
                             {steelRate > 0 ? '+' : ''}{steelRate}/s
                         </span>}
                     </div>
-                    <div className="flex items-center gap-1.5 bg-slate-800/50 px-3 py-1 rounded border border-slate-700/50">
+                    <div className="flex items-center gap-1.5 bg-slate-800/50 px-2 md:px-3 py-1 rounded border border-slate-700/50 shrink-0">
                         <Wheat size={14} className="text-amber-400" />
-                        <span className="text-xs text-slate-400">LƯƠNG THỰC</span>
+                        <span className="text-xs text-slate-400 hidden md:inline">LƯƠNG THỰC</span>
                         <span className="text-sm font-mono font-bold text-white">{resources.food}</span>
-                        {foodRate !== 0 && <span className={`text-xs font-mono ${foodRate > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                        {foodRate !== 0 && <span className={`text-[10px] md:text-xs font-mono ${foodRate > 0 ? 'text-green-400' : 'text-red-400'}`}>
                             {foodRate > 0 ? '+' : ''}{foodRate}/s
                         </span>}
                     </div>
-                    <div className="flex items-center gap-1.5 bg-slate-800/50 px-3 py-1 rounded border border-slate-700/50">
+                    <div className="flex items-center gap-1.5 bg-slate-800/50 px-2 md:px-3 py-1 rounded border border-slate-700/50 shrink-0">
                         <Users size={14} className="text-green-400" />
-                        <span className="text-xs text-slate-400">DÂN SỐ</span>
+                        <span className="text-xs text-slate-400 hidden md:inline">DÂN SỐ</span>
                         <span className="text-sm font-mono font-bold text-white">{stats.population}</span>
-                        {popRate > 0 && <span className="text-xs font-mono text-green-400">+{popRate}/s</span>}
+                        {popRate > 0 && <span className="text-[10px] md:text-xs font-mono text-green-400">+{popRate}/s</span>}
                     </div>
                 </div>
 
                 {/* Controls */}
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1 md:gap-2 shrink-0">
                     <button onClick={resetGame} className="p-2 bg-slate-800 rounded-lg border border-slate-700 text-slate-400 hover:text-orange-400 hover:border-orange-500 transition-all" title="Chơi lại">
                         <RotateCcw size={16} />
                     </button>
                     <button onClick={toggleHelp} className="p-2 bg-slate-800 rounded-lg border border-slate-700 text-slate-400 hover:text-white hover:border-slate-500 transition-all">
-                        <Settings size={16} />
+                        <CircleHelp size={16} /> {/* Changed to CircleHelp matching imports */}
                     </button>
                     <button
                         onClick={() => setIsRunning(!isRunning)}
@@ -425,94 +426,71 @@ export const Level3: React.FC<Level3Props> = ({ onComplete, addLog }) => {
                         style={{ backgroundImage: 'radial-gradient(#2d5a2d 1px, transparent 1px)', backgroundSize: '30px 30px' }}>
                     </div>
 
-                    {/* Objectives Panel - SIMPLIFIED */}
-                    <div className="absolute top-4 left-4 z-20 bg-slate-900/90 backdrop-blur border border-slate-700 rounded-lg p-4 w-64">
-                        <h4 className="text-sm font-bold text-white mb-3 flex items-center gap-2">
-                            🎯 Mục tiêu: Dân số 300
-                        </h4>
-
-                        {/* Main Progress */}
-                        <div className="mb-4">
-                            <div className="flex items-center justify-between mb-2">
-                                <span className="text-2xl font-mono font-bold text-cyan-400">{stats.population}</span>
-                                <span className="text-slate-400">/ 300</span>
-                            </div>
-                            <div className="h-3 bg-slate-800 rounded-full overflow-hidden">
-                                <div
-                                    className="h-full bg-gradient-to-r from-cyan-600 to-cyan-400 rounded-full transition-all duration-300"
-                                    style={{ width: `${Math.min(100, (stats.population / 300) * 100)}%` }}
-                                />
-                            </div>
-                            <p className="text-[10px] text-slate-500 mt-1">Xây Nông trang để tăng dân số</p>
+                    {/* Objectives Panel - Toggleable on mobile */}
+                    <div className="absolute top-4 left-4 z-20 pointer-events-none md:pointer-events-auto">
+                        {/* Toggle Button for Mobile */}
+                        <div className="pointer-events-auto md:hidden mb-2">
+                            <button
+                                onClick={() => setShowSummary(!showSummary)} // Using showSummary as toggle for mobile panel visibility or add new state
+                                className="bg-slate-900/90 border border-cyan-500/50 text-cyan-400 p-2 rounded-lg shadow-lg"
+                            >
+                                <Target size={20} />
+                            </button>
                         </div>
 
-                        {/* Quick Stats */}
-                        <div className="grid grid-cols-2 gap-2 text-[10px] border-t border-slate-700 pt-3">
-                            <div className="flex justify-between">
-                                <span className="text-slate-400">Vật chất:</span>
-                                <span className="text-blue-400 font-mono">{Math.floor(stats.material)}%</span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="text-slate-400">Ý thức:</span>
-                                <span className="text-purple-400 font-mono">{Math.floor(stats.consciousness)}%</span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="text-slate-400">Lượt:</span>
-                                <span className="text-white font-mono">{turn}</span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="text-slate-400">Công trình:</span>
-                                <span className="text-white font-mono">{buildings.filter(b => b.type !== 'empty').length}/16</span>
-                            </div>
-                        </div>
+                        <div className={`
+                            bg-slate-900/90 backdrop-blur border border-slate-700 rounded-lg p-4 w-64 pointer-events-auto transition-all origin-top-left
+                            ${window.innerWidth < 768 ? 'hidden' : 'block'} 
+                            md:block
+                        `}>
+                            {/* Render panel content always for desktop, handled differently for mobile if needed. 
+                                For simplicity, let's just make it visible on desktop and hidden on mobile unless toggled? 
+                                Actually, let's just use CSS media queries to hide/show or use a state.
+                            */}
+                            <h4 className="text-sm font-bold text-white mb-3 flex items-center gap-2">
+                                🎯 Mục tiêu: Dân số 300
+                            </h4>
 
-                        {/* Building Types Info */}
-                        <div className="border-t border-slate-700 pt-3 mt-3">
-                            <h5 className="text-[10px] font-bold text-slate-400 uppercase mb-2 flex items-center gap-1">
-                                🏗️ Công trình:
-                            </h5>
-                            <div className="grid grid-cols-2 gap-1.5">
-                                <div className="bg-slate-800/50 p-1.5 rounded text-[9px]">
-                                    <span className="text-green-400">🌾 Nông trang</span>
-                                    <p className="text-slate-500">+Dân số, +Lương thực</p>
+                            {/* Main Progress */}
+                            <div className="mb-4">
+                                <div className="flex items-center justify-between mb-2">
+                                    <span className="text-2xl font-mono font-bold text-cyan-400">{stats.population}</span>
+                                    <span className="text-slate-400">/ 300</span>
                                 </div>
-                                <div className="bg-slate-800/50 p-1.5 rounded text-[9px]">
-                                    <span className="text-blue-400">🏭 Nhà máy</span>
-                                    <p className="text-slate-500">+Thép, +Vật chất</p>
+                                <div className="h-3 bg-slate-800 rounded-full overflow-hidden">
+                                    <div
+                                        className="h-full bg-gradient-to-r from-cyan-600 to-cyan-400 rounded-full transition-all duration-300"
+                                        style={{ width: `${Math.min(100, (stats.population / 300) * 100)}%` }}
+                                    />
                                 </div>
-                                <div className="bg-slate-800/50 p-1.5 rounded text-[9px]">
-                                    <span className="text-purple-400">🎓 Trường học</span>
-                                    <p className="text-slate-500">+Ý thức</p>
-                                </div>
-                                <div className="bg-slate-800/50 p-1.5 rounded text-[9px]">
-                                    <span className="text-cyan-400">💻 Công nghệ</span>
-                                    <p className="text-slate-500">+Vật chất, +Ý thức</p>
-                                </div>
+                                <p className="text-[10px] text-slate-500 mt-1">Xây Nông trang để tăng dân số</p>
                             </div>
-                        </div>
 
-                        {/* Event Milestones */}
-                        <div className="border-t border-slate-700 pt-3 mt-3">
-                            <h5 className="text-[10px] font-bold text-slate-400 uppercase mb-2">
-                                📚 Sự kiện học tập:
-                            </h5>
-                            <div className="flex gap-1">
-                                {[3, 6, 9, 12].map(milestone => {
-                                    const current = buildings.filter(b => b.type !== 'empty').length;
-                                    const completed = current >= milestone;
-                                    return (
-                                        <div key={milestone} className={`flex-1 text-center py-1 rounded text-[9px] ${completed ? 'bg-green-500/20 text-green-400' : 'bg-slate-800 text-slate-500'}`}>
-                                            {milestone} {completed && '✓'}
-                                        </div>
-                                    );
-                                })}
+                            {/* Quick Stats */}
+                            <div className="grid grid-cols-2 gap-2 text-[10px] border-t border-slate-700 pt-3">
+                                <div className="flex justify-between">
+                                    <span className="text-slate-400">Vật chất:</span>
+                                    <span className="text-blue-400 font-mono">{Math.floor(stats.material)}%</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-slate-400">Ý thức:</span>
+                                    <span className="text-purple-400 font-mono">{Math.floor(stats.consciousness)}%</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-slate-400">Lượt:</span>
+                                    <span className="text-white font-mono">{turn}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-slate-400">Công trình:</span>
+                                    <span className="text-white font-mono">{buildings.filter(b => b.type !== 'empty').length}/16</span>
+                                </div>
                             </div>
                         </div>
                     </div>
 
                     {/* Isometric Grid */}
                     <div
-                        className="absolute top-1/2 left-1/2 transition-transform duration-300"
+                        className="absolute top-1/2 left-1/2 transition-transform duration-300 touch-pan-x touch-pan-y"
                         style={{
                             transform: `translate(-50%, -50%) scale(${zoom}) perspective(1000px) rotateX(55deg) rotateZ(45deg)`,
                         }}
@@ -523,7 +501,7 @@ export const Level3: React.FC<Level3Props> = ({ onComplete, addLog }) => {
                                     key={idx}
                                     onClick={() => building.type === 'empty' && selectedBuildType && handleBuild(selectedBuildType)}
                                     className={`
-                    w-24 h-24 rounded-lg transition-all duration-300 relative group cursor-pointer
+                    w-16 h-16 md:w-24 md:h-24 rounded-lg transition-all duration-300 relative group cursor-pointer
                     ${building.type === 'empty'
                                             ? 'bg-slate-800/30 hover:bg-slate-700/50 border-2 border-dashed border-slate-700 hover:border-slate-500'
                                             : 'bg-gradient-to-br from-slate-700/50 to-slate-800/70 border border-slate-600/50 shadow-xl'}
@@ -533,25 +511,25 @@ export const Level3: React.FC<Level3Props> = ({ onComplete, addLog }) => {
                                         <>
                                             {/* Building Icon */}
                                             <div className="absolute inset-0 flex items-center justify-center">
-                                                <div className="text-4xl transform -rotate-45">
+                                                <div className="text-2xl md:text-4xl transform -rotate-45">
                                                     {getBuildingIcon(building.type)}
                                                 </div>
                                             </div>
                                             {/* Building Label */}
-                                            <div className="absolute -top-8 left-1/2 -translate-x-1/2 transform -rotate-45 whitespace-nowrap">
-                                                <div className="bg-slate-900/90 backdrop-blur px-2 py-0.5 rounded text-[9px] text-white font-bold border border-slate-700 flex items-center gap-1">
-                                                    {building.type === 'factory' && <Factory size={10} className="text-blue-400" />}
-                                                    {building.type === 'farm' && <Wheat size={10} className="text-green-400" />}
-                                                    {building.type === 'school' && <GraduationCap size={10} className="text-purple-400" />}
-                                                    {building.type === 'tech' && <Cpu size={10} className="text-cyan-400" />}
-                                                    {building.name}
+                                            <div className="absolute -top-6 md:-top-8 left-1/2 -translate-x-1/2 transform -rotate-45 whitespace-nowrap z-10">
+                                                <div className="bg-slate-900/90 backdrop-blur px-1.5 py-0.5 rounded text-[7px] md:text-[9px] text-white font-bold border border-slate-700 flex items-center gap-1 shadow-lg">
+                                                    {building.type === 'factory' && <Factory size={8} className="text-blue-400" />}
+                                                    {building.type === 'farm' && <Wheat size={8} className="text-green-400" />}
+                                                    {building.type === 'school' && <GraduationCap size={8} className="text-purple-400" />}
+                                                    {building.type === 'tech' && <Cpu size={8} className="text-cyan-400" />}
+                                                    <span className="max-w-[60px] md:max-w-none truncate">{building.name}</span>
                                                 </div>
                                             </div>
                                         </>
                                     )}
                                     {building.type === 'empty' && selectedBuildType && (
                                         <div className="absolute inset-0 flex items-center justify-center text-slate-500">
-                                            <Plus size={24} />
+                                            <Plus size={20} className="md:w-6 md:h-6" />
                                         </div>
                                     )}
                                 </div>
@@ -560,18 +538,12 @@ export const Level3: React.FC<Level3Props> = ({ onComplete, addLog }) => {
                     </div>
 
                     {/* Trees decoration */}
-                    <div className="absolute bottom-10 left-10 text-green-700 opacity-50">
+                    <div className="absolute bottom-10 left-10 text-green-700 opacity-50 hidden md:block">
                         <TreePine size={40} />
-                    </div>
-                    <div className="absolute bottom-20 left-20 text-green-600 opacity-40">
-                        <TreePine size={30} />
-                    </div>
-                    <div className="absolute top-20 right-40 text-green-700 opacity-30">
-                        <TreePine size={35} />
                     </div>
 
                     {/* Zoom Controls */}
-                    <div className="absolute right-4 bottom-32 flex flex-col gap-1 z-20">
+                    <div className="absolute right-4 bottom-24 md:bottom-32 flex flex-col gap-1 z-20">
                         <button
                             onClick={() => setZoom(z => Math.min(1.5, z + 0.1))}
                             className="w-8 h-8 bg-slate-900/90 border border-slate-700 rounded text-slate-400 hover:text-white hover:border-slate-500 flex items-center justify-center transition-all"
@@ -584,40 +556,27 @@ export const Level3: React.FC<Level3Props> = ({ onComplete, addLog }) => {
                         >
                             <Minus size={16} />
                         </button>
-                        <button
-                            onClick={() => setZoom(1)}
-                            className="w-8 h-8 bg-slate-900/90 border border-slate-700 rounded text-slate-400 hover:text-white hover:border-slate-500 flex items-center justify-center transition-all"
-                        >
-                            <Target size={16} />
-                        </button>
                     </div>
                 </div>
 
                 {/* ===== SIDE PANEL ===== */}
                 {dialecticError && (
-                    <div className="absolute top-4 right-4 w-80 bg-slate-900/95 backdrop-blur border border-red-500/50 rounded-lg p-4 z-20 shadow-2xl">
+                    <div className="absolute top-16 left-1/2 -translate-x-1/2 md:translate-x-0 md:top-4 md:right-4 w-[90%] md:w-80 bg-slate-900/95 backdrop-blur border border-red-500/50 rounded-lg p-4 z-50 shadow-2xl animate-in slide-in-from-top-4">
                         <div className="flex items-center gap-2 text-red-400 mb-2">
                             <AlertTriangle size={16} />
                             <span className="text-xs font-bold uppercase tracking-wider">Lỗi Biện Chứng</span>
                         </div>
                         <h4 className="text-sm font-bold text-white mb-2">Mục tiêu quá xa rời thực tế khách quan!</h4>
                         <p className="text-xs text-slate-400 leading-relaxed">{dialecticError}</p>
-
-                        {/* Preview placeholder */}
-                        <div className="mt-4 bg-slate-800/50 rounded p-2 border border-slate-700">
-                            <div className="w-full h-20 bg-gradient-to-br from-slate-700 to-slate-800 rounded flex items-center justify-center">
-                                <Building2 size={32} className="text-slate-500" />
-                            </div>
-                        </div>
                     </div>
                 )}
             </div>
 
             {/* ===== BOTTOM BAR ===== */}
-            <div className="h-28 bg-slate-900/95 backdrop-blur border-t border-slate-700/50 flex items-center px-6 gap-6 z-30">
+            <div className="h-auto min-h-[5rem] md:h-28 bg-slate-900/95 backdrop-blur border-t border-slate-700/50 flex flex-col md:flex-row items-center px-4 py-2 md:px-6 gap-2 md:gap-6 z-30 shrink-0">
 
-                {/* Left: Material Progress */}
-                <div className="w-56">
+                {/* Left: Material Progress - Hidden on small mobile to save space or made compact */}
+                <div className="w-full md:w-56 hidden md:block">
                     <div className="flex items-center gap-2 mb-2">
                         <Hammer size={14} className="text-blue-400" />
                         <span className="text-xs font-bold text-slate-400 uppercase">Điều kiện Vật chất</span>
@@ -632,9 +591,9 @@ export const Level3: React.FC<Level3Props> = ({ onComplete, addLog }) => {
                     <p className="text-[10px] text-slate-600 mt-1">Năng lực sản xuất giới hạn sự mở rộng tư tưởng.</p>
                 </div>
 
-                {/* Center: Build Actions */}
-                <div className="flex-1 flex items-center justify-center gap-2">
-                    <span className="text-[10px] text-slate-500 uppercase font-bold mr-2">Hoạt động Xây dựng</span>
+                {/* Center: Build Actions - Horizontal Scroll on Mobile */}
+                <div className="w-full md:flex-1 flex items-center justify-start md:justify-center gap-2 overflow-x-auto no-scrollbar pb-2 md:pb-0">
+                    <span className="text-[10px] text-slate-500 uppercase font-bold mr-2 shrink-0 hidden md:block">Xây dựng</span>
 
                     {[
                         { type: 'farm' as BuildingType, icon: <Wheat size={20} />, label: 'NÔNG NGHIỆP', color: 'green' },
@@ -647,7 +606,7 @@ export const Level3: React.FC<Level3Props> = ({ onComplete, addLog }) => {
                             onClick={() => setSelectedBuildType(selectedBuildType === item.type ? null : item.type)}
                             disabled={!isRunning}
                             className={`
-                flex flex-col items-center gap-1 px-4 py-2 rounded-lg border transition-all
+                flex md:flex-col items-center gap-2 md:gap-1 px-4 py-2 md:py-2 rounded-lg border transition-all shrink-0
                 ${selectedBuildType === item.type
                                     ? `bg-${item.color}-500/20 border-${item.color}-500 text-${item.color}-400`
                                     : 'bg-slate-800/50 border-slate-700 text-slate-400 hover:border-slate-500 hover:text-white'}
@@ -655,13 +614,13 @@ export const Level3: React.FC<Level3Props> = ({ onComplete, addLog }) => {
               `}
                         >
                             {item.icon}
-                            <span className="text-[9px] font-bold uppercase">{item.label}</span>
+                            <span className="text-[10px] md:text-[9px] font-bold uppercase">{item.label}</span>
                         </button>
                     ))}
                 </div>
 
-                {/* Right: Consciousness Progress */}
-                <div className="w-56 text-right">
+                {/* Right: Consciousness Progress - Hidden on small mobile */}
+                <div className="w-full md:w-56 text-right hidden md:block">
                     <div className="flex items-center justify-end gap-2 mb-2">
                         <BookOpen size={14} className="text-purple-400" />
                         <span className="text-xs font-bold text-slate-400 uppercase">Mục tiêu Ý thức</span>
@@ -679,13 +638,14 @@ export const Level3: React.FC<Level3Props> = ({ onComplete, addLog }) => {
 
             {/* ===== MODALS ===== */}
 
-            {/* Help Modal - SIMPLIFIED */}
+            {/* Help Modal - Responsive */}
             {showHelp && (
                 <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-                    <div className="bg-slate-900 border border-cyan-500 rounded-lg max-w-md w-full p-6 shadow-2xl relative">
+                    <div className="bg-slate-900 border border-cyan-500 rounded-lg max-w-md w-full p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
                         <button onClick={toggleHelp} className="absolute top-4 right-4 text-slate-500 hover:text-white"><X size={20} /></button>
-                        <h3 className="text-2xl font-bold text-cyan-400 mb-4">🎮 Cách chơi</h3>
+                        <h3 className="text-xl md:text-2xl font-bold text-cyan-400 mb-4">🎮 Cách chơi</h3>
 
+                        {/* ... content ... */}
                         <div className="space-y-4 text-sm">
                             <div className="bg-cyan-500/10 p-3 rounded-lg border border-cyan-500/30">
                                 <p className="text-cyan-400 font-bold">🎯 Mục tiêu: Đạt 300 dân số</p>
@@ -699,30 +659,7 @@ export const Level3: React.FC<Level3Props> = ({ onComplete, addLog }) => {
                                     <li>Click vào ô trống trên bản đồ để xây</li>
                                 </ol>
                             </div>
-
-                            <div className="space-y-2">
-                                <p className="text-white font-bold">🏗️ Công trình:</p>
-                                <div className="grid grid-cols-2 gap-2 text-xs">
-                                    <div className="bg-slate-800 p-2 rounded">
-                                        <span className="text-green-400">🌾 Nông trang</span>
-                                        <p className="text-slate-400">+Dân số, +Lương thực</p>
-                                    </div>
-                                    <div className="bg-slate-800 p-2 rounded">
-                                        <span className="text-blue-400">🏭 Nhà máy</span>
-                                        <p className="text-slate-400">+Thép, +Vật chất</p>
-                                    </div>
-                                    <div className="bg-slate-800 p-2 rounded">
-                                        <span className="text-purple-400">🎓 Trường học</span>
-                                        <p className="text-slate-400">+Ý thức</p>
-                                    </div>
-                                    <div className="bg-slate-800 p-2 rounded">
-                                        <span className="text-cyan-400">💻 Công nghệ</span>
-                                        <p className="text-slate-400">+Vật chất, +Ý thức</p>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
-
                         <button onClick={toggleHelp} className="w-full mt-6 bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-3 rounded-lg text-lg">
                             BẮT ĐẦU CHƠI!
                         </button>

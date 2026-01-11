@@ -124,23 +124,26 @@ export const Level1: React.FC<Level1Props> = ({ onComplete, addLog, logs }) => {
     };
 
     // --- STAGE 1 LOGIC: CLASSIFICATION ---
-    const handleEntityDrop = (targetInfo: 'material' | 'consciousness') => {
-        if (!draggedEntity) return;
+    const handleEntityDrop = (targetInfo: 'material' | 'consciousness', entityStr?: any) => {
+        // Support both drag (state) and click (direct arg)
+        const currentEntity = entityStr || draggedEntity;
+
+        if (!currentEntity) return;
 
         playSound('click');
-        const isCorrect = draggedEntity.type === 'material'; // In this game, we only collect MATTER into the vortex
+        const isCorrect = currentEntity.type === 'material'; // In this game, we only collect MATTER into the vortex
 
         // Logic specifically designed: Drop MATTER into Vortex. Drop CONSCIOUSNESS -> Error.
         if (targetInfo === 'material') {
             if (isCorrect) {
                 playSound('success');
-                addLog(`Chính xác: '${draggedEntity.name}' là Vật chất.`, 'success');
+                addLog(`Chính xác: '${currentEntity.name}' là Vật chất.`, 'success');
                 setScore(s => s + 100);
-                setEntities(prev => prev.filter(e => e.id !== draggedEntity.id));
+                setEntities(prev => prev.filter(e => e.id !== currentEntity.id));
                 setStage1Progress(p => p + 1);
             } else {
                 playSound('error');
-                addLog(`SAI: '${draggedEntity.name}' là Ý thức, không thể tồn tại độc lập!`, 'error');
+                addLog(`SAI: '${currentEntity.name}' là Ý thức, không thể tồn tại độc lập!`, 'error');
                 setScore(s => Math.max(0, s - 50));
             }
         }
@@ -148,7 +151,10 @@ export const Level1: React.FC<Level1Props> = ({ onComplete, addLog, logs }) => {
 
         // Check completion of Stage 1
         const remainingMaterial = entities.filter(e => e.type === 'material').length;
-        if (remainingMaterial <= 1 && isCorrect) { // The last one is being removed
+        // Check if we just removed the last one (using currentEntity to check what we removed basically, or just re-check state logic carefully)
+        const nextRemaining = isCorrect ? remainingMaterial - 1 : remainingMaterial;
+
+        if (nextRemaining <= 0) {
             setTimeout(() => {
                 addLog("Hoàn thành Giai đoạn 1: Phân loại Vật chất.", 'info');
                 nextStage();
@@ -272,33 +278,34 @@ export const Level1: React.FC<Level1Props> = ({ onComplete, addLog, logs }) => {
     // 2. STAGE 1: CLASSIFICATION
     if (stage === 1) {
         return (
-            <div className="h-full flex flex-col p-6 space-y-4 bg-slate-950 relative overflow-hidden">
-                <div className="flex justify-between items-start z-10">
+            <div className="h-full flex flex-col p-4 md:p-6 space-y-2 md:space-y-4 bg-slate-950 relative overflow-hidden">
+                <div className="flex justify-between items-start z-10 shrink-0">
                     <div>
                         <div className="text-xs text-blue-400 font-bold uppercase tracking-widest mb-1">Giai đoạn 1/3</div>
-                        <h2 className="text-2xl font-display text-white">Phân Loại Thực Tại</h2>
-                        <p className="text-slate-400 text-sm">Kéo các thẻ <span className="text-blue-400 font-bold">VẬT CHẤT</span> vào Vòng Xoáy. Bỏ qua Ý Thức.</p>
+                        <h2 className="text-xl md:text-2xl font-display text-white">Phân Loại Thực Tại</h2>
+                        <p className="text-slate-400 text-xs md:text-sm">Kéo hoặc <span className="text-green-400 font-bold">Chạm</span> vào thẻ <span className="text-blue-400 font-bold">VẬT CHẤT</span>. Bỏ qua Ý Thức.</p>
                     </div>
                 </div>
 
-                <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-8 items-center z-10">
-                    {/* Source Items */}
-                    <div className="grid grid-cols-2 gap-3 content-start">
+                <div className="flex-1 flex flex-col lg:grid lg:grid-cols-2 gap-4 lg:gap-8 items-center z-10 overflow-hidden">
+                    {/* Source Items - Scrollable on mobile */}
+                    <div className="w-full h-full overflow-y-auto pr-2 grid grid-cols-2 gap-2 md:gap-3 content-start">
                         {entities.map(item => (
                             <div
                                 key={item.id}
                                 draggable
                                 onDragStart={() => { setDraggedEntity(item); playSound('click'); }}
-                                className="bg-slate-800 border border-slate-700 p-4 rounded-lg cursor-grab active:cursor-grabbing hover:border-blue-400 hover:bg-slate-700 transition-all select-none"
+                                onClick={() => handleEntityDrop('material', item)} // Tap to submit
+                                className="bg-slate-800 border border-slate-700 p-3 md:p-4 rounded-lg cursor-pointer hover:border-blue-400 hover:bg-slate-700 transition-all select-none active:scale-95 touch-manipulation"
                             >
-                                <div className="flex items-center gap-2 mb-2">
+                                <div className="flex items-center gap-2 mb-1 md:mb-2">
                                     {item.category === 'Vật lý' && <Zap size={14} className="text-cyan-400" />}
                                     {item.category === 'Tâm trí' && <Brain size={14} className="text-purple-400" />}
                                     {item.category === 'Xã hội' && <Globe size={14} className="text-green-400" />}
-                                    <span className="text-[10px] uppercase text-slate-500 font-bold">{item.category}</span>
+                                    <span className="text-[9px] md:text-[10px] uppercase text-slate-500 font-bold">{item.category}</span>
                                 </div>
-                                <div className="text-white font-bold">{item.name}</div>
-                                <div className="text-xs text-slate-500 mt-1 line-clamp-2">{item.description}</div>
+                                <div className="text-white font-bold text-sm md:text-base">{item.name}</div>
+                                <div className="text-[10px] md:text-xs text-slate-500 mt-1 line-clamp-2 md:line-clamp-none leading-tight">{item.description}</div>
                             </div>
                         ))}
                         {entities.filter(e => e.type === 'material').length === 0 && (
@@ -309,27 +316,29 @@ export const Level1: React.FC<Level1Props> = ({ onComplete, addLog, logs }) => {
                         )}
                     </div>
 
-                    {/* Target Vortex */}
+                    {/* Target Vortex - Fixed at bottom on mobile via flex logic */}
                     <div
-                        className={`
-                            relative aspect-square max-h-[400px] rounded-full border-2 flex items-center justify-center mx-auto w-full
-                            transition-all duration-300
-                            ${draggedEntity ? 'border-blue-500 bg-blue-500/5 shadow-[0_0_50px_rgba(59,130,246,0.2)]' : 'border-slate-800 bg-slate-900/50'}
-                        `}
+                        className="shrink-0 w-full flex justify-center pb-4 lg:pb-0"
                         onDragOver={(e) => e.preventDefault()}
                         onDrop={() => handleEntityDrop('material')}
                     >
-                        {/* Background Animation */}
-                        <div className="absolute inset-0 rounded-full border border-blue-500/20 animate-[spin_10s_linear_infinite]" />
-                        <div className="absolute inset-8 rounded-full border border-cyan-500/20 animate-[spin_7s_linear_infinite_reverse]" />
-                        <div className="absolute inset-16 rounded-full border border-purple-500/20 animate-[spin_5s_linear_infinite]" />
+                        <div className={`
+                            relative aspect-square w-48 h-48 md:w-80 md:h-80 lg:max-h-[400px] rounded-full border-2 flex items-center justify-center
+                            transition-all duration-300
+                            ${draggedEntity ? 'border-blue-500 bg-blue-500/5 shadow-[0_0_50px_rgba(59,130,246,0.2)]' : 'border-slate-800 bg-slate-900/50'}
+                        `}>
+                            {/* Background Animation - Optimized for mobile performance */}
+                            <div className="absolute inset-0 rounded-full border border-blue-500/20 animate-[spin_10s_linear_infinite]" />
+                            <div className="absolute inset-4 md:inset-8 rounded-full border border-cyan-500/20 animate-[spin_7s_linear_infinite_reverse]" />
+                            <div className="absolute inset-8 md:inset-16 rounded-full border border-purple-500/20 animate-[spin_5s_linear_infinite]" />
 
-                        <div className="text-center z-10 pointer-events-none">
-                            <Atom size={48} className={`mx-auto mb-2 text-blue-500 ${draggedEntity ? 'animate-bounce' : ''}`} />
-                            <h3 className="text-xl font-display font-bold text-white tracking-widest">VÒNG XOÁY VẬT CHẤT</h3>
-                            <p className="text-xs text-slate-400 mt-2 max-w-[200px] mx-auto">
-                                Nơi thu nhận thực tại khách quan.
-                            </p>
+                            <div className="text-center z-10 pointer-events-none">
+                                <Atom size={32} className={`mx-auto mb-1 md:mb-2 text-blue-500 md:w-12 md:h-12 ${draggedEntity ? 'animate-bounce' : ''}`} />
+                                <h3 className="text-sm md:text-xl font-display font-bold text-white tracking-widest">VÒNG XOÁY</h3>
+                                <p className="text-[9px] md:text-xs text-slate-400 mt-1 max-w-[120px] md:max-w-[200px] mx-auto hidden md:block">
+                                    Nơi thu nhận thực tại khách quan.
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -340,28 +349,30 @@ export const Level1: React.FC<Level1Props> = ({ onComplete, addLog, logs }) => {
     // 3. STAGE 2: FORMS OF MOTION
     if (stage === 2) {
         return (
-            <div className="h-full flex flex-col p-6 space-y-4 bg-slate-950 relative overflow-hidden">
-                <div className="z-10">
+            <div className="h-full flex flex-col p-4 md:p-6 space-y-4 bg-slate-950 relative overflow-hidden">
+                <div className="z-10 bg-slate-950/50 backdrop-blur-sm p-2 rounded-lg sticky top-0">
                     <div className="text-xs text-purple-400 font-bold uppercase tracking-widest mb-1">Giai đoạn 2/3</div>
-                    <h2 className="text-2xl font-display text-white">Các Hình Thức Vận Động</h2>
-                    <p className="text-slate-400 text-sm">Sắp xếp các ví dụ vào đúng thang bậc vận động (Từ thấp đến cao).</p>
+                    <h2 className="text-xl md:text-2xl font-display text-white">Các Hình Thức Vận Động</h2>
+                    <p className="text-slate-400 text-xs md:text-sm">Sắp xếp các ví dụ vào đúng thang bậc vận động (Từ thấp đến cao).</p>
                 </div>
 
-                <div className="flex-1 flex gap-8 z-10 overflow-hidden">
+                <div className="flex-1 flex flex-col lg:flex-row gap-4 lg:gap-8 z-10 overflow-hidden">
                     {/* Items Pool */}
-                    <div className="w-1/3 space-y-3">
-                        <h3 className="text-xs font-bold text-slate-500 uppercase mb-4">Các Ví Dụ Cần Xếp Hạng</h3>
-                        {availableMotionItems.map(item => (
-                            <div
-                                key={item.id}
-                                draggable
-                                onDragStart={() => { setDraggedMotionItem(item); playSound('click'); }}
-                                className="bg-slate-800 p-3 rounded border border-slate-700 flex items-center gap-3 cursor-grab hover:bg-slate-700 hover:border-white transition-all shadow-md"
-                            >
-                                <MousePointer2 size={16} className="text-slate-500" />
-                                <span className="font-bold text-slate-200">{item.label}</span>
-                            </div>
-                        ))}
+                    <div className="w-full lg:w-1/3 h-1/3 lg:h-full space-y-2 lg:space-y-3 overflow-y-auto pr-2">
+                        <h3 className="text-xs font-bold text-slate-500 uppercase mb-2 lg:mb-4">Ví Dụ Cần Xếp Hạng</h3>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-2">
+                            {availableMotionItems.map(item => (
+                                <div
+                                    key={item.id}
+                                    draggable
+                                    onDragStart={() => { setDraggedMotionItem(item); playSound('click'); }}
+                                    className="bg-slate-800 p-3 rounded border border-slate-700 flex items-center gap-3 cursor-grab hover:bg-slate-700 hover:border-white transition-all shadow-md touch-none"
+                                >
+                                    <MousePointer2 size={16} className="text-slate-500 shrink-0" />
+                                    <span className="font-bold text-slate-200 text-sm">{item.label}</span>
+                                </div>
+                            ))}
+                        </div>
                         {availableMotionItems.length === 0 && (
                             <div className="text-center text-green-400 py-8 bg-slate-900/50 rounded-lg">
                                 <CheckCircle className="mx-auto mb-2" />
@@ -371,9 +382,9 @@ export const Level1: React.FC<Level1Props> = ({ onComplete, addLog, logs }) => {
                     </div>
 
                     {/* Hierarchy Ladder */}
-                    <div className="flex-1 flex flex-col-reverse justify-between gap-2 relative bg-slate-900/30 p-4 rounded-xl border border-slate-800">
+                    <div className="flex-1 flex flex-col-reverse justify-between gap-1 lg:gap-2 relative bg-slate-900/30 p-2 lg:p-4 rounded-xl border border-slate-800 overflow-y-auto">
                         {/* Background Arrow */}
-                        <div className="absolute right-4 top-4 bottom-4 w-1 bg-gradient-to-t from-slate-800 via-blue-900 to-purple-500 rounded-full" />
+                        <div className="absolute right-4 top-4 bottom-4 w-1 bg-gradient-to-t from-slate-800 via-blue-900 to-purple-500 rounded-full hidden lg:block" />
 
                         {MOTION_FORMS.map((form, idx) => (
                             <div
@@ -381,26 +392,26 @@ export const Level1: React.FC<Level1Props> = ({ onComplete, addLog, logs }) => {
                                 onDragOver={(e) => e.preventDefault()}
                                 onDrop={() => handleMotionDrop(idx)}
                                 className={`
-                                    flex-1 flex items-center gap-4 px-6 rounded-lg border-2 transition-all relative
+                                    flex-1 flex items-center gap-2 lg:gap-4 px-3 lg:px-6 py-2 rounded-lg border-2 transition-all relative
                                     ${motionSlots[idx] ? 'border-green-500/50 bg-green-900/10' : 'border-dashed border-slate-700 bg-slate-900/50 hover:border-blue-500 hover:bg-slate-800'}
                                 `}
                             >
-                                <div className={`p-2 rounded-full ${motionSlots[idx] ? 'bg-green-500/20 text-green-400' : 'bg-slate-800 text-slate-500'}`}>
-                                    {form.icon}
+                                <div className={`p-1.5 lg:p-2 rounded-full shrink-0 ${motionSlots[idx] ? 'bg-green-500/20 text-green-400' : 'bg-slate-800 text-slate-500'}`}>
+                                    {React.cloneElement(form.icon as React.ReactElement, { size: 16 })}
                                 </div>
-                                <div className="w-32">
-                                    <div className="text-xs text-slate-500 uppercase font-bold">Mức độ {form.level}</div>
-                                    <div className="font-bold text-white">{form.name}</div>
+                                <div className="w-24 lg:w-32 shrink-0">
+                                    <div className="text-[10px] text-slate-500 uppercase font-bold">Mức độ {form.level}</div>
+                                    <div className="font-bold text-white text-sm lg:text-base">{form.name}</div>
                                 </div>
 
                                 {/* Slot Content */}
-                                <div className="flex-1 h-full flex items-center justify-center">
+                                <div className="flex-1 h-full flex items-center justify-start lg:justify-center">
                                     {motionSlots[idx] ? (
-                                        <div className="bg-green-500 text-slate-900 px-4 py-2 rounded font-bold shadow-lg animate-in fade-in zoom-in">
+                                        <div className="bg-green-500 text-slate-900 px-2 lg:px-4 py-1 lg:py-2 rounded font-bold shadow-lg animate-in fade-in zoom-in text-xs lg:text-sm truncate max-w-full">
                                             {motionSlots[idx]}
                                         </div>
                                     ) : (
-                                        <div className="text-slate-600 text-sm italic">Thả ví dụ vào đây</div>
+                                        <div className="text-slate-600 text-[10px] lg:text-sm italic">Thả ví dụ vào đây</div>
                                     )}
                                 </div>
                             </div>
