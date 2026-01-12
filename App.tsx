@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { GameView, UserState, LogEntry } from './types';
 import { Level1 } from './components/Level1';
 import { Level2 } from './components/Level2';
@@ -7,11 +7,26 @@ import { Leaderboard } from './components/Leaderboard';
 import { LayoutGrid, Network, Map, Trophy, User, Search, Settings, ShieldAlert, Home as HomeIcon, Menu, X } from 'lucide-react';
 import { Home } from './components/Home';
 import { searchPhilosophicalConceptWithFallback as searchPhilosophicalConcept } from './services/aiService';
-import { playSound } from './services/soundService';
+import { playSound, startBGM, resumeAudio } from './services/soundService';
 import { SettingsModal } from './components/SettingsModal';
 
 export default function App() {
     const [currentView, setCurrentView] = useState<GameView>(GameView.MENU);
+
+    // Global BGM Start
+    useEffect(() => {
+        startBGM('ambient');
+
+        // Try resume on likely interactions just in case
+        const resume = () => resumeAudio();
+        window.addEventListener('click', resume);
+        window.addEventListener('keydown', resume);
+        return () => {
+            window.removeEventListener('click', resume);
+            window.removeEventListener('keydown', resume);
+        };
+    }, []);
+
     const [userState, setUserState] = useState<UserState>({
         score: 0,
         level1Complete: false,
@@ -80,7 +95,7 @@ export default function App() {
     const renderContent = () => {
         switch (currentView) {
             case GameView.MENU:
-                return <Home onStart={(level) => { setCurrentView(level === 1 ? GameView.LEVEL_1 : level === 2 ? GameView.LEVEL_2 : GameView.LEVEL_3); setMenuOpen(false); }} />;
+                return <Home onStart={(level) => { resumeAudio(); setCurrentView(level === 1 ? GameView.LEVEL_1 : level === 2 ? GameView.LEVEL_2 : GameView.LEVEL_3); setMenuOpen(false); }} />;
             case GameView.LEVEL_1:
                 return <Level1 onComplete={(s) => handleLevelComplete(1, s)} addLog={addLog} logs={logs} />;
             case GameView.LEVEL_2:
@@ -95,7 +110,10 @@ export default function App() {
     };
 
     return (
-        <div className="flex flex-col h-screen w-screen overflow-hidden bg-slate-950 text-slate-200 font-sans selection:bg-blue-500/30">
+        <div
+            className="flex flex-col h-screen w-screen overflow-hidden bg-slate-950 text-slate-200 font-sans selection:bg-blue-500/30"
+            onClickCapture={() => resumeAudio()}
+        >
             {/* Top Navigation Bar */}
             <header className="h-16 border-b border-slate-800 bg-slate-900/80 backdrop-blur flex items-center justify-between px-6 z-50 relative">
                 <div className="flex items-center gap-4 cursor-pointer hover:opacity-80 transition-opacity" onClick={() => setCurrentView(GameView.MENU)}>

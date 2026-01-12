@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { SkillNode, LogEntry } from '../types';
 import { generateSkillNodeQuestionWithFallback as generateSkillNodeQuestion } from '../services/aiService';
 import { playSound } from '../services/soundService';
-import { Brain, Pickaxe, Eye, Microscope, Lock, CheckCircle, Unlock, CircleHelp, X, Trophy, BarChart3 } from 'lucide-react';
+import { Brain, Pickaxe, Eye, Microscope, Lock, CheckCircle, Unlock, CircleHelp, X, Trophy, BarChart3, Skull } from 'lucide-react';
 
 interface Level2Props {
     onComplete: (score: number) => void;
@@ -15,6 +15,8 @@ const INITIAL_NODES: SkillNode[] = [
     { id: 'labor', label: 'Lao động', x: 70, y: 30, status: 'unlocked', parents: ['root'], description: 'Hoạt động cải tạo thế giới tự nhiên' },
     { id: 'reflect', label: 'Phản Ánh', x: 20, y: 60, status: 'locked', parents: ['brain'], description: 'Thuộc tính chung của vật chất' },
     { id: 'language', label: 'Ngôn ngữ', x: 80, y: 60, status: 'locked', parents: ['labor'], description: 'Vỏ vật chất của tư duy' },
+    { id: 'social_psy', label: 'Tâm lý Xã hội', x: 40, y: 80, status: 'locked', parents: ['reflect'], description: 'Tình cảm, thói quen của cộng đồng' },
+    { id: 'ideology', label: 'Hệ tư tưởng', x: 60, y: 80, status: 'locked', parents: ['language', 'social_psy'], description: 'Triết học, Chính trị, Pháp quyền' },
 ];
 
 export const Level2: React.FC<Level2Props> = ({ onComplete, addLog }) => {
@@ -33,6 +35,20 @@ export const Level2: React.FC<Level2Props> = ({ onComplete, addLog }) => {
         attempts: number;
     }[]>([]);
 
+    // Labor Evolution Mechanics
+    const [laborProgress, setLaborProgress] = useState(0);
+    const [handStage, setHandStage] = useState(0); // 0: Ape, 1: Tool User, 2: Human
+    const LABOR_GOAL = 20;
+
+    // Debate Mechanics
+    const [debateOpen, setDebateOpen] = useState(false);
+    const [debateTurn, setDebateTurn] = useState<'player' | 'opponent'>('opponent');
+    const [opponentHp, setOpponentHp] = useState(100);
+    const [playerHp, setPlayerHp] = useState(100);
+
+    // Scoring
+    const [currentScore, setCurrentScore] = useState(500); // Start with max score, deduct on mistakes
+
     const toggleHelp = () => {
         playSound('click');
         setShowHelp(!showHelp);
@@ -47,6 +63,24 @@ export const Level2: React.FC<Level2Props> = ({ onComplete, addLog }) => {
         }
         if (node.status === 'completed') {
             addLog("Bạn đã thành thạo kiến thức này.", 'info');
+            return;
+        }
+
+        if (node.id === 'labor') {
+            setLaborProgress(0);
+            setHandStage(0);
+            // Don't open standard modal, open Labor modal
+            // We use a specific state for labor modal or reuse modalOpen with a type
+            setSelectedNode(node);
+            setModalOpen(true);
+            return;
+        }
+
+        if (node.id === 'ideology' || node.id === 'social_psy') {
+            setSelectedNode(node);
+            setDebateOpen(true);
+            setOpponentHp(100);
+            setPlayerHp(100);
             return;
         }
 
@@ -76,9 +110,9 @@ export const Level2: React.FC<Level2Props> = ({ onComplete, addLog }) => {
             }]);
 
             // Unlock children
-            const updatedNodes = nodes.map(n => {
+            const updatedNodes: SkillNode[] = nodes.map(n => {
                 if (n.id === selectedNode.id) return { ...n, status: 'completed' as const };
-                if (n.parents.includes(selectedNode.id)) return { ...n, status: 'unlocked' as const };
+                if (n.parents.includes(selectedNode.id) && n.status === 'locked') return { ...n, status: 'unlocked' as const };
                 return n;
             });
             setNodes(updatedNodes);
@@ -91,6 +125,7 @@ export const Level2: React.FC<Level2Props> = ({ onComplete, addLog }) => {
         } else {
             playSound('error');
             addLog("Sai rồi. Hãy suy nghĩ theo quan điểm duy vật biện chứng.", 'error');
+            setCurrentScore(prev => Math.max(0, prev - 50));
         }
     };
 
@@ -111,9 +146,15 @@ export const Level2: React.FC<Level2Props> = ({ onComplete, addLog }) => {
                     <h2 className="text-xl md:text-2xl font-display text-white">Cấp độ 2: Cây Ý Thức</h2>
                     <p className="text-slate-400 text-xs md:text-sm hidden md:block">Mở khóa các nút để hiểu về nguồn gốc tư duy con người.</p>
                 </div>
-                <button onClick={toggleHelp} className="p-2 bg-slate-800 border border-slate-600 rounded-full text-slate-400 hover:text-white hover:border-blue-500 transition-all z-50" title="Hướng dẫn">
-                    <CircleHelp size={20} />
-                </button>
+                <div className="flex flex-col items-end">
+                    <button onClick={toggleHelp} className="p-2 bg-slate-800 border border-slate-600 rounded-full text-slate-400 hover:text-white hover:border-blue-500 transition-all z-50 mb-2" title="Hướng dẫn">
+                        <CircleHelp size={20} />
+                    </button>
+                    <div className="bg-slate-900/80 backdrop-blur border border-yellow-500/50 px-3 py-1 rounded-full flex items-center gap-2">
+                        <Trophy size={14} className="text-yellow-400" />
+                        <span className="text-yellow-400 font-bold font-mono">{currentScore}</span>
+                    </div>
+                </div>
             </div>
 
             {/* Help Modal */}
@@ -191,46 +232,172 @@ export const Level2: React.FC<Level2Props> = ({ onComplete, addLog }) => {
                 ))}
             </div>
 
-            {/* Quiz Modal */}
-            {modalOpen && (
+            {/* Quiz / Labor Modal */}
+            {modalOpen && selectedNode && (
                 <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
                     <div className="bg-slate-900 border border-blue-500/50 rounded-xl p-6 max-w-lg w-full shadow-2xl relative">
                         <button onClick={() => setModalOpen(false)} className="absolute top-4 right-4 text-slate-500 hover:text-white">✕</button>
 
+                        {/* Title */}
                         <div className="flex items-center gap-3 mb-6">
                             <div className="p-3 bg-blue-500/10 rounded-lg text-blue-400">
-                                <Unlock size={24} />
+                                {selectedNode.id === 'labor' ? <Pickaxe size={24} /> : <Unlock size={24} />}
                             </div>
                             <div>
-                                <h3 className="text-xl font-bold text-white">Mở khóa: {selectedNode?.label}</h3>
-                                <p className="text-xs text-slate-400">YÊU CẦU: TRẢ LỜI ĐÚNG ĐỂ TIẾP TỤC</p>
+                                <h3 className="text-xl font-bold text-white">
+                                    {selectedNode.id === 'labor' ? 'Lao Động Biến Hình' : `Mở khóa: ${selectedNode.label}`}
+                                </h3>
+                                <p className="text-xs text-slate-400">
+                                    {selectedNode.id === 'labor' ? 'CLICK ĐỂ CHẾ TÁC CÔNG CỤ & TIẾN HÓA' : 'YÊU CẦU: TRẢ LỜI ĐÚNG ĐỂ TIẾP TỤC'}
+                                </p>
                             </div>
                         </div>
 
-                        {loading ? (
-                            <div className="py-12 flex flex-col items-center justify-center text-slate-400">
-                                <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-                                <p>Đang tải dữ liệu từ Cỗ máy...</p>
+                        {/* LABOR EVOLUTION GAME */}
+                        {selectedNode.id === 'labor' ? (
+                            <div className="flex flex-col items-center">
+                                {/* Visual Evolution */}
+                                <div className="w-32 h-32 mb-6 bg-slate-800 rounded-full flex items-center justify-center relative overflow-hidden ring-4 ring-blue-500/20 shadow-[0_0_30px_rgba(59,130,246,0.2)]">
+                                    <div className={`transition-all duration-500 transform ${laborProgress % 2 === 0 ? 'scale-105' : 'scale-100'}`}>
+                                        {handStage === 0 && <span className="text-4xl">🦍</span>} {/* Ape */}
+                                        {handStage === 1 && <span className="text-4xl">🔨</span>} {/* Tool */}
+                                        {handStage === 2 && <span className="text-4xl">🧠</span>} {/* Human Brain */}
+                                    </div>
+                                    <div className="absolute bottom-0 left-0 right-0 h-full bg-blue-500/20 origin-bottom transition-all duration-300"
+                                        style={{ transform: `scaleY(${laborProgress / LABOR_GOAL})` }}></div>
+                                </div>
+
+                                <p className="text-center text-slate-300 mb-4 h-12">
+                                    {handStage === 0 ? "Vượn cổ đang học cách cầm nắm..." :
+                                        handStage === 1 ? "Người tối cổ bắt đầu chế tác đá..." :
+                                            "Bộ não phát triển nhờ lao động!"}
+                                </p>
+
+                                <button
+                                    onClick={() => {
+                                        playSound('click'); // Or a hitting sound
+                                        const newProgress = laborProgress + 1;
+                                        setLaborProgress(newProgress);
+
+                                        // Update visual stage based on progress
+                                        if (newProgress > LABOR_GOAL * 0.3) setHandStage(1);
+                                        if (newProgress > LABOR_GOAL * 0.8) setHandStage(2);
+
+                                        if (newProgress >= LABOR_GOAL) {
+                                            playSound('success');
+                                            addLog('Lao động đã sáng tạo ra con người!', 'success');
+
+                                            // Complete Node Logic inline for simplicity
+                                            const updatedNodes: SkillNode[] = nodes.map(n => {
+                                                if (n.id === 'labor') return { ...n, status: 'completed' as const };
+                                                if (n.parents.includes('labor') && n.status === 'locked') return { ...n, status: 'unlocked' as const };
+                                                return n;
+                                            });
+                                            setNodes(updatedNodes);
+                                            setModalOpen(false);
+                                        }
+                                    }}
+                                    className="w-full bg-amber-600 hover:bg-amber-500 text-white font-bold py-4 rounded-xl shadow-lg active:scale-95 transition-all text-xl flex items-center justify-center gap-2"
+                                >
+                                    <Pickaxe className="animate-bounce" /> LAO ĐỘNG NGAY!
+                                </button>
+                                <p className="text-xs text-slate-500 mt-2">Click liên tục để tiến hóa</p>
                             </div>
                         ) : (
-                            <div>
-                                <p className="text-slate-200 mb-6 italic">"{currentQuiz?.question}"</p>
-                                <div className="space-y-3">
-                                    {currentQuiz?.options.map((option, idx) => (
+                            /* STANDARD QUIZ */
+                            loading ? (
+                                <div className="py-12 flex flex-col items-center justify-center text-slate-400">
+                                    <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+                                    <p>Đang tải dữ liệu từ Cỗ máy...</p>
+                                </div>
+                            ) : (
+                                <div>
+                                    <p className="text-slate-200 mb-6 italic">"{currentQuiz?.question}"</p>
+                                    <div className="space-y-3">
+                                        {currentQuiz?.options.map((option, idx) => (
+                                            <button
+                                                key={idx}
+                                                onClick={() => handleAnswer(idx)}
+                                                className="w-full text-left p-4 rounded-lg bg-slate-800 border border-slate-700 hover:border-blue-500 hover:bg-slate-700 transition-all text-sm group"
+                                            >
+                                                <span className="inline-block w-6 h-6 rounded bg-slate-900 text-center leading-6 text-slate-500 group-hover:text-blue-400 mr-3 text-xs border border-slate-700 font-mono">
+                                                    {String.fromCharCode(65 + idx)}
+                                                </span>
+                                                {option}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            )
+                        )}
+                    </div>
+                </div>
+            )}
+
+            {/* Debate Modal */}
+            {debateOpen && selectedNode && (
+                <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4">
+                    <div className="bg-slate-950 border border-red-500 rounded-xl max-w-2xl w-full h-[600px] shadow-2xl relative flex flex-col overflow-hidden">
+                        <button onClick={() => setDebateOpen(false)} className="absolute top-4 right-4 text-slate-500 hover:text-white z-10">✕</button>
+
+                        <div className="flex-1 flex flex-col items-center justify-center p-8 relative">
+                            {/* Opponent Area */}
+                            <div className="text-center mb-8 relative z-10">
+                                <div className="w-20 h-20 bg-red-900/50 rounded-full mx-auto mb-2 border-2 border-red-500 flex items-center justify-center">
+                                    <Skull size={40} className="text-red-400" />
+                                </div>
+                                <h3 className="text-red-400 font-bold uppercase">Nhà Duy Tâm</h3>
+                                <div className="w-48 h-2 bg-slate-800 rounded-full mx-auto mt-2 overflow-hidden border border-slate-700">
+                                    <div className="h-full bg-red-500 transition-all duration-500" style={{ width: `${opponentHp}%` }}></div>
+                                </div>
+                                <div className="mt-4 bg-white/10 backdrop-blur p-4 rounded-xl border border-white/20 max-w-md mx-auto">
+                                    <p className="text-white italic text-lg">"Ý thức có trước, vật chất có sau. Thần linh đã ban tặng linh hồn cho con người!"</p>
+                                </div>
+                            </div>
+
+                            {/* Center Interaction */}
+                            <div className="my-4 text-slate-500 font-mono text-xs">VS</div>
+
+                            {/* Player Area (Hand) */}
+                            <div className="absolute bottom-0 left-0 right-0 p-6 bg-slate-900/80 border-t border-slate-700">
+                                <p className="text-slate-400 text-xs mb-2 text-center">Chọn thẻ bài để phản biện:</p>
+                                <div className="flex justify-center gap-4">
+                                    {[
+                                        { label: "Thực tiễn", desc: "Kiểm chứng chân lý", dmg: 40 },
+                                        { label: "Vật chất", desc: "Cái có trước", dmg: 35 },
+                                        { label: "Biện chứng", desc: "Sự vận động", dmg: 50 },
+                                    ].map((card, idx) => (
                                         <button
                                             key={idx}
-                                            onClick={() => handleAnswer(idx)}
-                                            className="w-full text-left p-4 rounded-lg bg-slate-800 border border-slate-700 hover:border-blue-500 hover:bg-slate-700 transition-all text-sm group"
+                                            onClick={() => {
+                                                const dmg = card.dmg; // Simplified logic
+                                                const newHp = Math.max(0, opponentHp - dmg);
+                                                setOpponentHp(newHp);
+                                                playSound('attack'); // Need sound
+
+                                                if (newHp === 0) {
+                                                    playSound('success');
+                                                    addLog(`Bạn đã đánh bại tư tưởng duy tâm! Mở khóa: ${selectedNode.label}`, 'success');
+                                                    // Complete logic
+                                                    const updatedNodes: SkillNode[] = nodes.map(n => {
+                                                        if (n.id === selectedNode.id) return { ...n, status: 'completed' as const };
+                                                        if (n.parents.includes(selectedNode.id) && n.status === 'locked') return { ...n, status: 'unlocked' as const };
+                                                        return n;
+                                                    });
+                                                    setNodes(updatedNodes);
+                                                    setDebateOpen(false);
+                                                }
+                                            }}
+                                            className="bg-slate-800 hover:bg-blue-600 border border-slate-600 hover:border-blue-400 rounded-lg p-3 w-32 transition-all hover:-translate-y-2 cursor-pointer group"
                                         >
-                                            <span className="inline-block w-6 h-6 rounded bg-slate-900 text-center leading-6 text-slate-500 group-hover:text-blue-400 mr-3 text-xs border border-slate-700 font-mono">
-                                                {String.fromCharCode(65 + idx)}
-                                            </span>
-                                            {option}
+                                            <h4 className="text-white font-bold text-sm mb-1 group-hover:text-yellow-300">{card.label}</h4>
+                                            <p className="text-[10px] text-slate-400 group-hover:text-white">{card.desc}</p>
+                                            <div className="mt-2 text-xs font-mono text-red-400 group-hover:text-white">SAT: {card.dmg}</div>
                                         </button>
                                     ))}
                                 </div>
                             </div>
-                        )}
+                        </div>
                     </div>
                 </div>
             )}
@@ -239,7 +406,7 @@ export const Level2: React.FC<Level2Props> = ({ onComplete, addLog }) => {
             {showSummary && (
                 <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4 overflow-auto">
                     <div className="bg-slate-900 border border-green-500 rounded-xl p-6 max-w-2xl w-full shadow-2xl relative my-8">
-                        <button onClick={() => { setShowSummary(false); onComplete(500); }} className="absolute top-4 right-4 text-slate-500 hover:text-white"><X size={20} /></button>
+                        <button onClick={() => { setShowSummary(false); onComplete(currentScore); }} className="absolute top-4 right-4 text-slate-500 hover:text-white"><X size={20} /></button>
 
                         {/* Header */}
                         <div className="flex items-center gap-4 mb-6 pb-4 border-b border-slate-700">
@@ -263,7 +430,7 @@ export const Level2: React.FC<Level2Props> = ({ onComplete, addLog }) => {
                                 <div className="text-xs text-slate-400">Trả lời đúng</div>
                             </div>
                             <div className="bg-slate-800 p-4 rounded-lg text-center">
-                                <div className="text-3xl font-bold text-yellow-400">500</div>
+                                <div className="text-3xl font-bold text-yellow-400">{currentScore}</div>
                                 <div className="text-xs text-slate-400">Điểm nhận được</div>
                             </div>
                         </div>
@@ -302,7 +469,7 @@ export const Level2: React.FC<Level2Props> = ({ onComplete, addLog }) => {
                         </div>
 
                         <button
-                            onClick={() => { setShowSummary(false); onComplete(500); }}
+                            onClick={() => { setShowSummary(false); onComplete(currentScore); }}
                             className="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-lg transition-colors text-lg"
                         >
                             Tiếp tục → Cấp độ 3

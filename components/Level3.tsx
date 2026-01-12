@@ -82,6 +82,13 @@ export const Level3: React.FC<Level3Props> = ({ onComplete, addLog }) => {
     const laborRate = schoolCount * 3;
     const popRate = (farmCount > 0) ? farmCount * 2 : 0;
 
+    const consumptionRate = 1 + Math.floor(stats.population / 25);
+    const materialNetRate = (factoryCount * 2 + techCount * 1) - consumptionRate;
+
+    let consConsumptionRate = 0.5 + Math.floor(stats.population / 40);
+    if (stats.material < 30) consConsumptionRate += 2;
+    const consNetRate = (schoolCount * 2 + techCount * 2) - consConsumptionRate;
+
     // Refs
     const statsRef = useRef(stats);
     useEffect(() => { statsRef.current = stats; }, [stats]);
@@ -139,19 +146,29 @@ export const Level3: React.FC<Level3Props> = ({ onComplete, addLog }) => {
         setStats(prev => {
             const newStats = { ...prev };
 
-            // Material from factories and tech
-            newStats.material = Math.min(100, newStats.material + factories * 2 + techs * 1);
+            // Material from factories and tech - MINUS CONSUMPTION (Reproduction cost)
+            const consumption = 1 + Math.floor(newStats.population / 25); // Base 1 + 1 per 25 pop
+            const materialProduction = factories * 2 + techs * 1;
+            const netMaterialChange = materialProduction - consumption;
 
-            // Consciousness from schools and tech
-            newStats.consciousness = Math.min(100, newStats.consciousness + schools * 2 + techs * 2);
+            newStats.material = Math.max(0, Math.min(100, newStats.material + netMaterialChange));
+
+            // Consciousness from schools and tech - MINUS DILUTION (Maintenance cost) & REALITY CHECK
+            let consConsumption = 0.5 + Math.floor(newStats.population / 40); // Slower decay than material
+            if (newStats.material < 30) consConsumption += 2; // "Có thực mới vực được đạo" - Low material kills consciousness
+
+            const consProduction = schools * 2 + techs * 2;
+            const netConsChange = consProduction - consConsumption;
+
+            newStats.consciousness = Math.min(100, newStats.consciousness + netConsChange);
 
             // Population from farms
             if (farms > 0 && resources.food > 0) {
                 newStats.population += farms * 2;
             }
 
-            // === WIN CONDITION: Population >= 300 ===
-            if (newStats.population >= 300) {
+            // === WIN CONDITION: All 3 Goals Met ===
+            if (newStats.population >= 300 && newStats.material >= 100 && newStats.consciousness >= 100) {
                 setIsRunning(false);
                 playSound('levelComplete');
 
@@ -461,7 +478,7 @@ export const Level3: React.FC<Level3Props> = ({ onComplete, addLog }) => {
                                 Actually, let's just use CSS media queries to hide/show or use a state.
                             */}
                             <h4 className="text-sm font-bold text-white mb-3 flex items-center gap-2">
-                                🎯 Mục tiêu: Dân số 300
+                                🎯 Mục tiêu: Hoàn thành 3 chỉ số
                             </h4>
 
                             {/* Main Progress */}
@@ -479,16 +496,36 @@ export const Level3: React.FC<Level3Props> = ({ onComplete, addLog }) => {
                                 <p className="text-[10px] text-slate-500 mt-1">Xây Nông trang để tăng dân số</p>
                             </div>
 
+                            {/* Secondary Goals */}
+                            <div className="space-y-3 mb-4 border-t border-slate-700/50 pt-3">
+                                <div>
+                                    <div className="flex items-center justify-between mb-1">
+                                        <span className="text-xs text-slate-300">Vật chất (Mục tiêu: 100)</span>
+                                        <span className="text-xs font-mono font-bold text-blue-400">{Math.floor(stats.material)}</span>
+                                    </div>
+                                    <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
+                                        <div
+                                            className="h-full bg-blue-500 rounded-full transition-all duration-300"
+                                            style={{ width: `${Math.min(100, stats.material)}%` }}
+                                        />
+                                    </div>
+                                </div>
+                                <div>
+                                    <div className="flex items-center justify-between mb-1">
+                                        <span className="text-xs text-slate-300">Ý thức (Mục tiêu: 100)</span>
+                                        <span className="text-xs font-mono font-bold text-purple-400">{Math.floor(stats.consciousness)}</span>
+                                    </div>
+                                    <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
+                                        <div
+                                            className="h-full bg-purple-500 rounded-full transition-all duration-300"
+                                            style={{ width: `${Math.min(100, stats.consciousness)}%` }}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
                             {/* Quick Stats */}
                             <div className="grid grid-cols-2 gap-2 text-[10px] border-t border-slate-700 pt-3">
-                                <div className="flex justify-between">
-                                    <span className="text-slate-400">Vật chất:</span>
-                                    <span className="text-blue-400 font-mono">{Math.floor(stats.material)}%</span>
-                                </div>
-                                <div className="flex justify-between">
-                                    <span className="text-slate-400">Ý thức:</span>
-                                    <span className="text-purple-400 font-mono">{Math.floor(stats.consciousness)}%</span>
-                                </div>
                                 <div className="flex justify-between">
                                     <span className="text-slate-400">Lượt:</span>
                                     <span className="text-white font-mono">{turn}</span>
@@ -594,6 +631,9 @@ export const Level3: React.FC<Level3Props> = ({ onComplete, addLog }) => {
                         <Hammer size={14} className="text-blue-400" />
                         <span className="text-xs font-bold text-slate-400 uppercase">Điều kiện Vật chất</span>
                         <span className="text-sm font-mono font-bold text-blue-400">{Math.floor(stats.material)}%</span>
+                        <span className={`text-[10px] font-mono ml-2 ${materialNetRate >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                            ({materialNetRate >= 0 ? '+' : ''}{materialNetRate}/s)
+                        </span>
                     </div>
                     <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
                         <div
@@ -638,6 +678,9 @@ export const Level3: React.FC<Level3Props> = ({ onComplete, addLog }) => {
                         <BookOpen size={14} className="text-purple-400" />
                         <span className="text-xs font-bold text-slate-400 uppercase">Mục tiêu Ý thức</span>
                         <span className="text-sm font-mono font-bold text-purple-400">{Math.floor(stats.consciousness)}%</span>
+                        <span className={`text-[10px] font-mono ml-2 ${consNetRate >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                            ({consNetRate >= 0 ? '+' : ''}{consNetRate}/s)
+                        </span>
                     </div>
                     <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
                         <div
@@ -645,7 +688,9 @@ export const Level3: React.FC<Level3Props> = ({ onComplete, addLog }) => {
                             style={{ width: `${Math.min(100, stats.consciousness)}%` }}
                         />
                     </div>
-                    <p className="text-[10px] text-slate-600 mt-1">Tham vọng vượt quá thực tế vật chất.</p>
+                    <p className="text-[10px] text-slate-600 mt-1">
+                        {stats.material < 30 ? "Vật chất thiếu thốn làm suy giảm Ý thức!" : "Tham vọng vượt quá thực tế vật chất."}
+                    </p>
                 </div>
             </div>
 
@@ -661,7 +706,12 @@ export const Level3: React.FC<Level3Props> = ({ onComplete, addLog }) => {
                         {/* ... content ... */}
                         <div className="space-y-4 text-sm">
                             <div className="bg-cyan-500/10 p-3 rounded-lg border border-cyan-500/30">
-                                <p className="text-cyan-400 font-bold">🎯 Mục tiêu: Đạt 300 dân số</p>
+                                <p className="text-cyan-400 font-bold">🎯 Mục tiêu chiến thắng:</p>
+                                <ul className="list-disc ml-5 mt-1 text-slate-300">
+                                    <li>Dân số: 300</li>
+                                    <li>Vật chất: 100</li>
+                                    <li>Ý thức: 100</li>
+                                </ul>
                             </div>
 
                             <div className="space-y-2">
