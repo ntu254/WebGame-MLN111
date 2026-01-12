@@ -1,117 +1,90 @@
-# Nhà Tư Duy Trẻ: Cỗ Máy Biện Chứng
+# Nhà Tư Duy Trẻ: Cỗ Máy Biện Chứng 🤖🧠
 
-Một trò chơi giáo dục triết học tương tác khám phá Chủ nghĩa Duy vật Biện chứng qua ba cấp độ, được xây dựng bằng React, TypeScript và tích hợp AI qua Google Gemini.
+**Phiên bản Giáo dục Tương tác 2.0 - Khám phá Triết học Mác-Lênin qua Gamification**
 
-## 🛠 Yêu cầu hệ thống
+Dự án này là một web game giáo dục tương tác, biến những khái niệm triết học trừu tượng thành các trải nghiệm trực quan, sinh động. Người chơi sẽ hành trình qua 3 cấp độ nhận thức để "tốt nghiệp" khóa học Triết học.
 
-- **Node.js**: Phiên bản 18.0.0 trở lên.
-- **Trình quản lý gói**: npm hoặc yarn.
+![Banner](https://img.shields.io/badge/Status-Active-success) ![Tech](https://img.shields.io/badge/Tech-React_Typescript_Vite-blue) ![AI](https://img.shields.io/badge/AI-Google_Gemini-orange)
 
-## 🚀 Hướng dẫn Cài đặt & Chạy Local
+---
 
-### 1. Khởi tạo dự án (Nếu chưa có)
+## 🌟 Tính Năng Nổi Bật
 
-Chúng ta sẽ sử dụng Vite để tạo môi trường chạy React TypeScript. Mở Terminal và chạy lệnh:
+### 1. Level 1: Thế Giới Quan Duy Vật (Hành Trình Vật Chất)
+*Khắc sâu nguyên lý: "Vật chất có trước, Ý thức có sau".*
+- **Chặng 1 (Phân loại):** Game kéo thả (Drag & Drop) để phân biệt các hiện tượng Vật chất và Ý thức, tránh bẫy "Anti-Matter".
+- **Chặng 2 (Vận động):** Game nhịp điệu (Rhythm Game). Thu thập các hình thức vận động của vật chất (Cơ, Lý, Hóa, Sinh, Xã hội) trên nền nhạc.
+- **Chặng 3 (Không-Thời gian):** Game chạy vô tận (Endless Runner) trong đường hầm không-thời gian. Né tránh chướng ngại vật và trả lời câu hỏi nhanh để kiến tạo dòng chảy lịch sử.
 
+### 2. Level 2: Nguồn Gốc Ý Thức (Cây Ý Thức)
+*Giải mã sự ra đời của tư duy con người.*
+- **Lao động Biến hình (Clicker):** Mô phỏng quá trình tiến hóa từ Vượn -> Người thông qua lao động và chế tác công cụ.
+- **Tranh biện Triết học (Card Battle):** Đấu bài lý luận với "Nhà Duy Tâm". Sử dụng các thẻ bài "Thực tiễn", "Vật chất", "Biện chứng" để đánh bại các lập luận sai lầm.
+- **Hệ thống Kỹ năng:** Mở khóa cây kỹ năng từ Phản ánh, Ngôn ngữ đến Tư duy trừu tượng.
+
+### 3. Level 3: Phép Biện Chứng (Tháp Biện Chứng)
+*Vận dụng Triết học vào Xây dựng Xã hội.*
+- **Mô phỏng Xã hội (Sim City-lite):** Quản lý mối quan hệ biện chứng giữa **Cơ sở hạ tầng** (Kinh tế) và **Kiến trúc thượng tầng** (Văn hóa/Chính trị).
+- **Cách mạng Xã hội:** Kích hoạt "Bước nhảy lượng-chất" khi các mâu thuẫn xã hội đã chín muồi để đưa xã hội lên hình thái cao hơn.
+- **AI Advisor:** Cố vấn ảo (AI) đưa ra lời khuyên chiến lược dựa trên tình hình thực tế.
+
+---
+
+## 🤖 Tích Hợp Trí Tuệ Nhân Tạo (AI)
+
+Dự án sử dụng **Google Gemini (Flash Model)** làm bộ xử lý trung tâm:
+- **Game Master:** Tự động tạo câu hỏi trắc nghiệm ngữ cảnh, không trùng lặp.
+- **Judge (Trọng tài):** Phân tích câu trả lời của người chơi trong các tình huống khó.
+- **Advisor (Cố vấn):** Đóng vai các nhà tư tưởng để đưa ra gợi ý trong Level 3.
+
+---
+
+## 🛠 Yêu cầu Hệ thống
+
+- **Node.js**: Phiên bản 18+
+- **NPM/Yarn**: Trình quản lý gói tiêu chuẩn.
+
+---
+
+## 🚀 Hướng dẫn Cài đặt & Chạy
+
+### 1. Cài đặt Dependencies
+Mở terminal tại thư mục dự án và chạy:
 ```bash
-npm create vite@latest nha-tu-duy-tre -- --template react-ts
-cd nha-tu-duy-tre
+npm install
 ```
 
-### 2. Cài đặt các thư viện phụ thuộc
-
-Dự án sử dụng các thư viện: `lucide-react` (icon), `recharts` (biểu đồ), `@google/genai` (AI SDK) và `@supabase/supabase-js` (Database).
-
-Chạy lệnh sau để cài đặt:
-
-```bash
-npm install lucide-react recharts @google/genai @supabase/supabase-js
-```
-
-### 3. Sao chép mã nguồn
-
-Hãy sao chép các file code vào đúng cấu trúc thư mục trong dự án Vite vừa tạo:
-
-- **`index.html`**: Thay thế file ở thư mục gốc (root).
-- **`src/App.tsx`**: Thay thế file trong thư mục `src`.
-- **`src/types.ts`**: Tạo mới file này trong `src`.
-- **`src/components/`**: Tạo thư mục này và chép các file `Level1.tsx`, `Level2.tsx`, `Level3.tsx`, `Leaderboard.tsx` vào đây.
-- **`src/services/`**: Tạo thư mục này và chép các file `geminiService.ts`, `soundService.ts`, `supabaseService.ts` vào đây.
-- **`src/index.tsx`**: Đổi tên file `src/main.tsx` của Vite thành `index.tsx` hoặc copy nội dung file `index.tsx` đè lên `main.tsx`.
-
-### 4. Cấu hình Biến môi trường (.env)
-
-Tạo một file tên là `.env` tại **thư mục gốc** của dự án (ngang hàng với `package.json`) và điền thông tin sau:
+### 2. Cấu hình Biến Môi trường (.env)
+Tạo file `.env` tại thư mục gốc và điền thông tin API Key của bạn:
 
 ```env
-# API Key Google Gemini (BẮT BUỘC để AI hoạt động)
-# Lấy key miễn phí tại: https://aistudio.google.com/app/apikey
-API_KEY=your_google_gemini_api_key
+# Google Gemini API Key (Bắt buộc cho các tính năng AI)
+# Lấy miễn phí tại: https://aistudio.google.com/app/apikey
+VITE_GEMINI_API_KEY=your_api_key_here
 
-# Cấu hình Supabase (TÙY CHỌN - Để lưu bảng xếp hạng)
+# Supabase Configuration (Tùy chọn - Cho Bảng xếp hạng)
 VITE_SUPABASE_URL=your_supabase_url
 VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 ```
 
-### 5. Cấu hình Vite (Quan trọng!)
-
-Do mã nguồn sử dụng `process.env` (chuẩn Node.js) thay vì `import.meta.env` (chuẩn Vite), bạn cần cập nhật file `vite.config.ts` để dự án chạy đúng:
-
-Mở file `vite.config.ts` và sửa thành:
-
-```typescript
-import { defineConfig, loadEnv } from 'vite'
-import react from '@vitejs/plugin-react'
-
-// https://vitejs.dev/config/
-export default defineConfig(({ mode }) => {
-  const env = loadEnv(mode, process.cwd(), '');
-  return {
-    plugins: [react()],
-    define: {
-      'process.env': env
-    }
-  }
-})
-```
-
-### 6. Chạy dự án
-
-Sau khi hoàn tất, chạy lệnh:
-
+### 3. Khởi chạy
+Chạy server phát triển:
 ```bash
 npm run dev
 ```
-
-Truy cập vào địa chỉ hiển thị trên terminal (thường là `http://localhost:5173`) để chơi game.
+Truy cập `http://localhost:5173` để trải nghiệm.
 
 ---
 
-## 🗄 Cấu hình Database (Supabase)
+## 📚 Công Nghệ Sử Dụng
+- **Frontend Framework**: React 18, TypeScript
+- **Build Tool**: Vite
+- **Styling**: Tailwind CSS, Lucide React (Icons)
+- **AI SDK**: Google Generative AI SDK
+- **Database**: Supabase (PostgreSQL)
 
-Để tính năng Bảng xếp hạng (Leaderboard) hoạt động, bạn cần tạo bảng trong Supabase:
+---
 
-1. Vào **SQL Editor** trong dashboard Supabase.
-2. Chạy câu lệnh SQL sau:
-
-```sql
-create table leaderboard (
-  id uuid default gen_random_uuid() primary key,
-  username text not null,
-  score int8 not null,
-  created_at timestamp with time zone default timezone('utc'::text, now())
-);
-
--- Cho phép ai cũng có thể xem bảng xếp hạng (SELECT)
-alter table leaderboard enable row level security;
-create policy "Public Leaderboard View" on leaderboard for select using (true);
-
--- Cho phép ai cũng có thể lưu điểm (INSERT)
-create policy "Public Score Save" on leaderboard for insert with check (true);
-```
-
-## 🎮 Cách chơi
-
-1. **Level 1 (Vật Chất)**: Kéo thả các thực thể vào vòng xoáy nếu chúng là Vật chất.
-2. **Level 2 (Ý Thức)**: Mở khóa Cây Ý Thức bằng cách trả lời câu hỏi trắc nghiệm.
-3. **Level 3 (Biện Chứng)**: Quản lý xã hội giả lập, cân bằng giữa Vật chất, Ý thức và Ổn định.
+## 📝 Giấy Phép
+Dự án mã nguồn mở phục vụ mục đích giáo dục phi lợi nhuận.
+*© 2026 Cỗ Máy Biện Chứng nttu254.*

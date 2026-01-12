@@ -212,7 +212,7 @@ export default function App() {
                     <span className="flex items-center gap-1"><ShieldAlert size={10} /> Bảo mật cấp 3</span>
                 </div>
                 <div>
-                    Powered by React & OpenRouter AI
+                    Powered by nttu254
                 </div>
             </footer>
 

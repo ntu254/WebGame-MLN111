@@ -233,8 +233,8 @@ export const Home: React.FC<HomeProps> = ({ onStart }) => {
                 </div>
 
                 <div className="text-center pt-8 text-slate-600 text-[10px] md:text-xs font-mono">
-                    <p>Dự án mã nguồn mở phục vụ cộng đồng sinh viên Việt Nam</p>
-                    <p>© 2024 Cỗ Máy Biện Chứng. All rights reserved.</p>
+                    <p>Dự án mã nguồn mở phục vụ cộng đồng sinh viên FPT University</p>
+                    <p>© 2026 Cỗ Máy Biện Chứng by nttu254. All rights reserved.</p>
                 </div>
             </div>
         </div>
