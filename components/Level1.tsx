@@ -145,18 +145,40 @@ export const Level1: React.FC<Level1Props> = ({ onComplete, addLog, logs }) => {
     const [fallingItems, setFallingItems] = useState<{ id: number, item: typeof DROPPABLE_ITEMS[0], y: number, hit: boolean }[]>([]);
     const [collectedTypes, setCollectedTypes] = useState<Set<string>>(new Set());
 
+    // Ref for spawn logic to avoid stale closure in setInterval
+    const collectedTypesRef = useRef(collectedTypes);
+    useEffect(() => { collectedTypesRef.current = collectedTypes; }, [collectedTypes]);
+
     useEffect(() => {
         if (stage === 2) {
             // Spawn items
+            const spawnItem = () => {
+                let pool = DROPPABLE_ITEMS;
+
+                // Smart Spawn: If user has 3+ types, prioritize missing ones
+                // Use ref to get fresh state in interval
+                if (collectedTypesRef.current.size >= 3) {
+                    const missing = DROPPABLE_ITEMS.filter(item => !collectedTypesRef.current.has(item.type));
+                    if (missing.length > 0) {
+                        pool = missing;
+                    }
+                }
+
+                const randomItem = pool[Math.floor(Math.random() * pool.length)];
+                setFallingItems(prev => [...prev, {
+                    id: Date.now(),
+                    item: randomItem,
+                    y: -10,
+                    hit: false
+                }]);
+            };
+
+            // Spawn first item immediately to avoid waiting
+            spawnItem();
+
             const spawnInterval = setInterval(() => {
-                if (Math.random() < 0.4) { // Reduced spawn rate
-                    const randomItem = DROPPABLE_ITEMS[Math.floor(Math.random() * DROPPABLE_ITEMS.length)];
-                    setFallingItems(prev => [...prev, {
-                        id: Date.now(),
-                        item: randomItem,
-                        y: -10,
-                        hit: false
-                    }]);
+                if (Math.random() < 0.3) { // Reduced spawn rate
+                    spawnItem();
                 }
             }, 1000);
 
@@ -244,7 +266,7 @@ export const Level1: React.FC<Level1Props> = ({ onComplete, addLog, logs }) => {
     const [playerPos, setPlayerPos] = useState(50); // % X
     const [obstacles, setObstacles] = useState<{ id: number, x: number, y: number, type: 'barrier' | 'orb' }[]>([]);
     const [isQuizActive, setIsQuizActive] = useState(false);
-    const TUNNEL_DURATION = 30; // Seconds
+    const TUNNEL_DURATION = 10; // Seconds
 
     useEffect(() => {
         if (stage === 3 && !isQuizActive) {
@@ -294,8 +316,8 @@ export const Level1: React.FC<Level1Props> = ({ onComplete, addLog, logs }) => {
                     const kept = prev.filter(ob => {
                         if (ob.y > 80 && ob.y < 95 && Math.abs(ob.x - playerPosRef.current) < 10) {
                             if (ob.type === 'barrier') {
-                                playSound('error');
-                                setScore(s => Math.max(0, s - 50));
+                                playSound('error'); // Keep sound or change to 'alert'
+                                // setScore(s => Math.max(0, s - 50)); // REMOVED INITIAL PENALTY
                                 hitBarrier = true;
                                 return false; // Remove
                             } else if (ob.type === 'orb') {
@@ -410,10 +432,11 @@ export const Level1: React.FC<Level1Props> = ({ onComplete, addLog, logs }) => {
 
         if (isCorrect) {
             playSound('success');
-            setScore(s => s + 50); // Recuperate some points
+            setScore(s => s + 50); // Plus points
             setQuizFeedback({ isCorrect: true, text: "Chính xác! " + currentQ.explanation });
         } else {
             playSound('error');
+            setScore(s => Math.max(0, s - 50)); // Minus points
             setQuizFeedback({ isCorrect: false, text: "Chưa đúng. " + currentQ.explanation });
         }
 
@@ -684,11 +707,11 @@ export const Level1: React.FC<Level1Props> = ({ onComplete, addLog, logs }) => {
                     <div
                         key={ob.id}
                         className={`absolute w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-transform
-                            ${ob.type === 'barrier' ? 'bg-red-500 border-2 border-red-400 animate-pulse' : 'bg-green-400 border-2 border-white animate-bounce'}
+                            ${ob.type === 'barrier' ? 'bg-purple-900/80 border-2 border-purple-400 animate-pulse shadow-[0_0_15px_rgba(168,85,247,0.5)]' : 'bg-green-400 border-2 border-white animate-bounce'}
                         `}
                         style={{ left: `${ob.x}%`, top: `${ob.y}%`, transform: `translate(-50%, -50%) scale(${0.5 + (ob.y / 100)})` }}
                     >
-                        {ob.type === 'barrier' ? <X size={24} className="text-white" /> : <Atom size={24} className="text-white spin" />}
+                        {ob.type === 'barrier' ? <CircleHelp size={28} className="text-purple-200" /> : <Atom size={24} className="text-white spin" />}
                     </div>
                 ))}
 
@@ -711,8 +734,8 @@ export const Level1: React.FC<Level1Props> = ({ onComplete, addLog, logs }) => {
                 {isQuizActive && (
                     <div className="absolute inset-0 z-50 bg-black/80 flex items-center justify-center p-4 backdrop-blur-sm">
                         <div className="bg-slate-900 border border-slate-700 rounded-2xl p-6 md:p-8 max-w-2xl w-full shadow-2xl animate-in zoom-in-95 cursor-auto pointer-events-auto">
-                            <h3 className="text-xl font-bold text-red-400 mb-4 uppercase flex items-center gap-2">
-                                <ShieldAlert /> Cảnh báo va chạm!
+                            <h3 className="text-xl font-bold text-purple-400 mb-4 uppercase flex items-center gap-2">
+                                <CircleHelp /> Câu hỏi nhận thức!
                             </h3>
                             <p className="text-slate-300 mb-6 font-display text-lg">{QUIZ_DATA[currentQuizIdx].question}</p>
                             <div className="grid grid-cols-1 gap-3">

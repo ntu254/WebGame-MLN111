@@ -85,11 +85,16 @@ export const Home: React.FC<HomeProps> = ({ onStart }) => {
                             <div className="w-12 h-12 bg-blue-500/20 text-blue-400 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                                 <Zap size={24} />
                             </div>
-                            <h3 className="text-xl font-bold text-white mb-2">Cấp 1: Thế Giới Quan Duy Vật</h3>
-                            <p className="text-blue-400 text-xs font-bold uppercase tracking-wider mb-4">Nhận diện Thực tại</p>
+                            <h3 className="text-xl font-bold text-white mb-2">Cấp 1: Hành Trình Vật Chất</h3>
+                            <p className="text-blue-400 text-xs font-bold uppercase tracking-wider mb-4">Bản thể luận & Vận động</p>
                             <div className="text-slate-400 text-sm space-y-3">
-                                <p><strong>Nhiệm vụ:</strong> Phân loại chính xác các hiện tượng vào nhóm "Vật chất" hoặc "Ý thức".</p>
-                                <p><strong>Bài học:</strong> Khắc sâu nguyên lý cơ bản: <em>"Vật chất có trước, ý thức có sau"</em>. Rèn luyện khả năng phân biệt giữa khách quan (sự thật) và chủ quan (suy nghĩ).</p>
+                                <p><strong>Nhiệm vụ:</strong> Vượt qua 3 chặng thử thách:</p>
+                                <ul className="list-disc pl-4 space-y-1 text-xs">
+                                    <li><strong>Chặng 1:</strong> Phân loại Vật chất & Ý thức (Kéo thả).</li>
+                                    <li><strong>Chặng 2:</strong> Vũ điệu Nguyên tử (Game nhịp điệu).</li>
+                                    <li><strong>Chặng 3:</strong> Đường hầm Không-Thời gian (Né chướng ngại & Giải đố).</li>
+                                </ul>
+                                <p className="pt-2 border-t border-slate-800">Hiểu sâu sắc về tính khách quan và các hình thức vận động của vật chất.</p>
                             </div>
                             <button onClick={() => onStart(1)} className="mt-6 w-full py-2 bg-slate-800 hover:bg-blue-600 rounded text-slate-300 hover:text-white font-bold text-sm transition-colors">Bắt đầu Cấp 1</button>
                         </div>
@@ -99,11 +104,15 @@ export const Home: React.FC<HomeProps> = ({ onStart }) => {
                             <div className="w-12 h-12 bg-purple-500/20 text-purple-400 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                                 <Brain size={24} />
                             </div>
-                            <h3 className="text-xl font-bold text-white mb-2">Cấp 2: Nguồn Gốc Ý Thức</h3>
-                            <p className="text-purple-400 text-xs font-bold uppercase tracking-wider mb-4">Giải mã Tư duy</p>
+                            <h3 className="text-xl font-bold text-white mb-2">Cấp 2: Cây Ý Thức</h3>
+                            <p className="text-purple-400 text-xs font-bold uppercase tracking-wider mb-4">Nguồn gốc & Bản chất</p>
                             <div className="text-slate-400 text-sm space-y-3">
-                                <p><strong>Nhiệm vụ:</strong> Kết nối các yếu tố: Lao động, Ngôn ngữ, Bộ óc người để mở khóa sự ra đời của Ý thức.</p>
-                                <p><strong>Bài học:</strong> Hiểu rõ nguồn gốc tự nhiên và nguồn gốc xã hội của ý thức. Ý thức không phải do thần thánh ban tặng, mà là kết quả của quá trình tiến hóa và lao động.</p>
+                                <p><strong>Nhiệm vụ:</strong> Mở khóa cây kỹ năng thông qua:</p>
+                                <ul className="list-disc pl-4 space-y-1 text-xs">
+                                    <li><strong>Lao động biến hình:</strong> Tiến hóa từ vượn thành người qua lao động (Clicker).</li>
+                                    <li><strong>Tranh biện triết học:</strong> Đấu bài lý luận (Card Battle) chống lại quan điểm Duy tâm.</li>
+                                </ul>
+                                <p className="pt-2 border-t border-slate-800">Chứng minh nguồn gốc vật chất và vai trò của lao động đối với ý thức.</p>
                             </div>
                             <button onClick={() => onStart(2)} className="mt-6 w-full py-2 bg-slate-800 hover:bg-purple-600 rounded text-slate-300 hover:text-white font-bold text-sm transition-colors">Bắt đầu Cấp 2</button>
                         </div>
@@ -113,11 +122,15 @@ export const Home: React.FC<HomeProps> = ({ onStart }) => {
                             <div className="w-12 h-12 bg-green-500/20 text-green-400 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                                 <Building2 size={24} />
                             </div>
-                            <h3 className="text-xl font-bold text-white mb-2">Cấp 3: Phép Biện Chứng</h3>
-                            <p className="text-green-400 text-xs font-bold uppercase tracking-wider mb-4">Xây dựng & Kiến tạo</p>
+                            <h3 className="text-xl font-bold text-white mb-2">Cấp 3: Tháp Biện Chứng</h3>
+                            <p className="text-green-400 text-xs font-bold uppercase tracking-wider mb-4">Chủ nghĩa Duy vật Lịch sử</p>
                             <div className="text-slate-400 text-sm space-y-3">
-                                <p><strong>Nhiệm vụ:</strong> Điều hành một xã hội giả lập. Cân bằng các chỉ số thông qua các quyết định dựa trên quy luật Mâu thuẫn và Lượng - Chất.</p>
-                                <p><strong>Bài học:</strong> Áp dụng triết học vào quản lý và đời sống. Hiểu rằng sự phát triển đến từ việc giải quyết các mâu thuẫn nội tại.</p>
+                                <p><strong>Nhiệm vụ:</strong> Xây dựng xã hội qua các thời kỳ lịch sử:</p>
+                                <ul className="list-disc pl-4 space-y-1 text-xs">
+                                    <li><strong>Cân bằng Tháp:</strong> Mối quan hệ biện chứng giữa Cơ sở hạ tầng & Kiến trúc thượng tầng.</li>
+                                    <li><strong>Cách mạng xã hội:</strong> Kích hoạt "Bước nhảy" khi mâu thuẫn chín muồi.</li>
+                                </ul>
+                                <p className="pt-2 border-t border-slate-800">Vận dụng quy luật Lượng-Chất và Mâu thuẫn để kiến tạo lịch sử.</p>
                             </div>
                             <button onClick={() => onStart(3)} className="mt-6 w-full py-2 bg-slate-800 hover:bg-green-600 rounded text-slate-300 hover:text-white font-bold text-sm transition-colors">Bắt đầu Cấp 3</button>
                         </div>
