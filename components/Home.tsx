@@ -1,5 +1,5 @@
 import React from 'react';
-import { Play, BookOpen, Brain, Zap, Building2, ArrowRight, Star, Shield, Users } from 'lucide-react';
+import { Play, BookOpen, Brain, Zap, Building2, ArrowRight, Star, Shield, Users, Lightbulb, Target, HeartHandshake } from 'lucide-react';
 
 interface HomeProps {
     onStart: (level: number) => void;
@@ -8,143 +8,149 @@ interface HomeProps {
 export const Home: React.FC<HomeProps> = ({ onStart }) => {
     return (
         <div className="h-full w-full overflow-y-auto bg-slate-950 p-4 md:p-12 scrollbar-thin scrollbar-thumb-slate-800">
-            <div className="max-w-6xl mx-auto space-y-12 md:space-y-16 animate-in fade-in duration-700 slide-in-from-bottom-4">
+            <div className="max-w-6xl mx-auto space-y-16 animate-in fade-in duration-700 slide-in-from-bottom-4">
 
                 {/* Hero Section */}
-                <div className="text-center space-y-4 md:space-y-6 relative py-8 md:py-12">
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] md:w-[600px] h-[300px] md:h-[400px] bg-blue-500/10 blur-[60px] md:blur-[100px] rounded-full pointer-events-none"></div>
-                    <div className="inline-flex items-center gap-2 px-3 py-1 md:px-4 md:py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs md:text-sm font-medium mb-2 md:mb-4">
+                <div className="text-center space-y-6 relative py-12">
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-blue-500/10 blur-[100px] rounded-full pointer-events-none"></div>
+                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-sm font-medium mb-4">
                         <Star size={14} className="fill-blue-400" />
-                        <span>Phiên bản Giáo dục 2.0</span>
+                        <span>Phiên bản Giáo dục Tương tác 2.0</span>
                     </div>
 
-                    <h1 className="text-3xl md:text-7xl font-display font-bold text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-200 to-slate-400 tracking-tight leading-tight">
+                    <h1 className="text-4xl md:text-7xl font-display font-bold text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-200 to-slate-400 tracking-tight leading-tight">
                         NHÀ TƯ DUY TRẺ<br />
                         <span className="text-blue-500">CỖ MÁY BIỆN CHỨNG</span>
                     </h1>
 
-                    <p className="text-sm md:text-xl text-slate-400 max-w-3xl mx-auto leading-relaxed px-2">
-                        Chào mừng bạn đến với hệ thống mô phỏng tư duy Triết học Mác - Lênin.
-                        Nơi bạn không chỉ học lý thuyết, mà còn trực tiếp <span className="text-white font-bold">trải nghiệm</span> và <span className="text-white font-bold">vận dụng</span> các quy luật biện chứng để giải quyết vấn đề.
+                    <p className="text-lg md:text-xl text-slate-300 max-w-4xl mx-auto leading-relaxed px-4">
+                        "Triết học không chỉ để giải thích thế giới, mà là để <span className="text-blue-400 font-bold">cải tạo</span> thế giới."
                     </p>
 
-                    <div className="flex flex-col md:flex-row justify-center gap-3 pt-4 px-4">
+                    <div className="flex flex-col md:flex-row justify-center gap-4 pt-6 px-4">
                         <button
                             onClick={() => onStart(1)}
-                            className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-lg font-bold text-base md:text-lg transition-all shadow-lg hover:shadow-blue-500/25 flex items-center justify-center gap-2 group w-full md:w-auto"
+                            className="bg-blue-600 hover:bg-blue-500 text-white px-8 py-4 rounded-xl font-bold text-lg transition-all shadow-lg hover:shadow-blue-500/25 flex items-center justify-center gap-3 group w-full md:w-auto"
                         >
-                            <Play size={20} className="fill-white group-hover:scale-110 transition-transform" />
-                            KHỞI ĐỘNG CỖ MÁY
-                        </button>
-                        <button className="bg-slate-800 hover:bg-slate-700 text-slate-200 px-6 py-3 rounded-lg font-bold text-base md:text-lg transition-all border border-slate-700 hover:border-slate-500 flex items-center justify-center gap-2 w-full md:w-auto">
-                            <BookOpen size={20} />
-                            HƯỚNG DẪN
+                            <Play size={24} className="fill-white group-hover:scale-110 transition-transform" />
+                            KHỞI ĐỘNG HÀNH TRÌNH
                         </button>
                     </div>
                 </div>
 
-                {/* Levels Overview */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8">
-                    {/* Level 1 Card */}
-                    <div className="group relative bg-slate-900/50 hover:bg-slate-900 border border-slate-800 hover:border-blue-500/50 rounded-2xl p-6 md:p-8 transition-all duration-300 hover:-translate-y-2">
-                        <div className="absolute inset-x-0 -top-px h-px bg-gradient-to-r from-transparent via-blue-500/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-
-                        <div className="w-12 h-12 md:w-14 md:h-14 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center mb-4 md:mb-6 shadow-lg shadow-blue-500/20 group-hover:scale-110 transition-transform duration-500">
-                            <Zap size={24} className="text-white md:w-8 md:h-8" />
+                {/* Section: Mục đích & Ý nghĩa */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
+                    <div className="space-y-6">
+                        <h2 className="text-2xl font-bold text-white flex items-center gap-3">
+                            <Target className="text-red-500" />
+                            Mục Đích Dự Án
+                        </h2>
+                        <div className="bg-slate-900/50 p-6 rounded-2xl border border-slate-800 text-slate-300 leading-relaxed text-sm md:text-base">
+                            <p className="mb-4">
+                                Triết học Mác - Lênin thường bị coi là khô khan và trừu tượng. Dự án <strong>"Cỗ Máy Biện Chứng"</strong> ra đời với sứ mệnh:
+                            </p>
+                            <ul className="space-y-3 list-disc pl-5">
+                                <li><strong className="text-white">Trực quan hóa:</strong> Biến các khái niệm "Vật chất", "Ý thức", "Biện chứng" thành hình ảnh và tương tác sinh động.</li>
+                                <li><strong className="text-white">Học qua trải nghiệm (Gamification):</strong> Thay vì học thuộc lòng, bạn sẽ tự mình khám phá quy luật thông qua các thử thách.</li>
+                                <li><strong className="text-white">Rèn luyện tư duy:</strong> Hình thành năng lực tư duy logic, nhìn nhận vấn đề đa chiều và khách quan.</li>
+                            </ul>
                         </div>
-
-                        <h3 className="text-xl md:text-2xl font-bold text-white mb-2">Cấp độ 1: Vật Chất</h3>
-                        <p className="text-blue-400 font-mono text-xs md:text-sm mb-4 uppercase tracking-wider">Phân loại Thực tại</p>
-
-                        <p className="text-slate-400 mb-6 text-xs md:text-sm leading-relaxed">
-                            Bước vào Vòng xoáy Vật chất. Nhiệm vụ của bạn là phân định rõ ràng giữa Vật chất (thực tại khách quan) và Ý thức (phản ánh chủ quan). Bản lĩnh của nhà tư duy bắt đầu từ việc nhìn nhận đúng sự thật.
-                        </p>
-
-                        <button
-                            onClick={() => onStart(1)}
-                            className="w-full py-3 bg-slate-800 group-hover:bg-blue-600 text-slate-300 group-hover:text-white rounded-lg font-bold text-sm transition-colors flex items-center justify-center gap-2"
-                        >
-                            Truy cập Module <ArrowRight size={16} />
-                        </button>
                     </div>
 
-                    {/* Level 2 Card */}
-                    <div className="group relative bg-slate-900/50 hover:bg-slate-900 border border-slate-800 hover:border-purple-500/50 rounded-2xl p-6 md:p-8 transition-all duration-300 hover:-translate-y-2">
-                        <div className="absolute inset-x-0 -top-px h-px bg-gradient-to-r from-transparent via-purple-500/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-
-                        <div className="w-12 h-12 md:w-14 md:h-14 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center mb-4 md:mb-6 shadow-lg shadow-purple-500/20 group-hover:scale-110 transition-transform duration-500">
-                            <Brain size={24} className="text-white md:w-8 md:h-8" />
+                    <div className="space-y-6">
+                        <h2 className="text-2xl font-bold text-white flex items-center gap-3">
+                            <HeartHandshake className="text-green-500" />
+                            Ứng Dụng Thực Tiễn
+                        </h2>
+                        <div className="bg-slate-900/50 p-6 rounded-2xl border border-slate-800 text-slate-300 leading-relaxed text-sm md:text-base">
+                            <p className="mb-4">
+                                Không chỉ là điểm số trên lớp, tư duy biện chứng là công cụ sắc bén trong cuộc sống:
+                            </p>
+                            <ul className="space-y-3 list-disc pl-5">
+                                <li><strong className="text-white">Giải quyết vấn đề:</strong> Phân tích nguyên nhân gốc rễ, nhìn thấy sự vận động và phát triển của sự việc.</li>
+                                <li><strong className="text-white">Ra quyết định:</strong> Tránh chủ quan duy ý chí, luôn dựa trên thực tế khách quan.</li>
+                                <li><strong className="text-white">Thích ứng:</strong> Hiểu rằng mọi thứ luôn thay đổi, giúp bạn linh hoạt và chủ động trước hoàn cảnh mới.</li>
+                            </ul>
                         </div>
-
-                        <h3 className="text-xl md:text-2xl font-bold text-white mb-2">Cấp độ 2: Ý Thức</h3>
-                        <p className="text-purple-400 font-mono text-xs md:text-sm mb-4 uppercase tracking-wider">Nguồn gốc Tư duy</p>
-
-                        <p className="text-slate-400 mb-6 text-xs md:text-sm leading-relaxed">
-                            Khai mở Cây Ý Thức. Truy tìm nguồn gốc ra đời của ý thức từ thủa sơ khai đến văn minh hiện đại. Lao động, Ngôn ngữ và Bộ óc con người đóng vai trò gì?
-                        </p>
-
-                        <button
-                            onClick={() => onStart(2)}
-                            className="w-full py-3 bg-slate-800 group-hover:bg-purple-600 text-slate-300 group-hover:text-white rounded-lg font-bold text-sm transition-colors flex items-center justify-center gap-2"
-                        >
-                            Truy cập Module <ArrowRight size={16} />
-                        </button>
-                    </div>
-
-                    {/* Level 3 Card */}
-                    <div className="group relative bg-slate-900/50 hover:bg-slate-900 border border-slate-800 hover:border-cyan-500/50 rounded-2xl p-6 md:p-8 transition-all duration-300 hover:-translate-y-2">
-                        <div className="absolute inset-x-0 -top-px h-px bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-
-                        <div className="w-12 h-12 md:w-14 md:h-14 bg-gradient-to-br from-cyan-500 to-green-500 rounded-xl flex items-center justify-center mb-4 md:mb-6 shadow-lg shadow-cyan-500/20 group-hover:scale-110 transition-transform duration-500">
-                            <Building2 size={24} className="text-white md:w-8 md:h-8" />
-                        </div>
-
-                        <h3 className="text-xl md:text-2xl font-bold text-white mb-2">Cấp độ 3: Biện Chứng</h3>
-                        <p className="text-cyan-400 font-mono text-xs md:text-sm mb-4 uppercase tracking-wider">Xã hội & Vận động</p>
-
-                        <p className="text-slate-400 mb-6 text-xs md:text-sm leading-relaxed">
-                            Thử thách tối thượng: Xây dựng một xã hội thịnh vượng dựa trên nền tảng Duy vật Biện chứng. Cân bằng giữa Cơ sở vật chất và Kiến trúc thượng tầng, giải quyết mâu thuẫn để phát triển.
-                        </p>
-
-                        <button
-                            onClick={() => onStart(3)}
-                            className="w-full py-3 bg-slate-800 group-hover:bg-cyan-600 text-slate-300 group-hover:text-white rounded-lg font-bold text-sm transition-colors flex items-center justify-center gap-2"
-                        >
-                            Truy cập Module <ArrowRight size={16} />
-                        </button>
                     </div>
                 </div>
 
-                {/* Features / Footer Info */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 pt-8 md:pt-12 border-t border-slate-800/50">
-                    <div className="flex items-start gap-4 p-4 rounded-lg bg-slate-900/30">
-                        <div className="p-2 bg-slate-800 rounded-lg text-yellow-400 shrink-0">
-                            <Star size={20} />
+                {/* Section: Hướng dẫn chi tiết các cấp độ */}
+                <div className="space-y-8 pt-8 border-t border-slate-800">
+                    <h2 className="text-3xl font-bold text-white text-center mb-8">Lộ Trình Tư Duy (3 Cấp Độ)</h2>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        {/* Level 1 Detail */}
+                        <div className="bg-gradient-to-b from-slate-900 to-slate-950 p-6 rounded-2xl border border-slate-800 hover:border-blue-500/50 transition-colors group">
+                            <div className="w-12 h-12 bg-blue-500/20 text-blue-400 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                                <Zap size={24} />
+                            </div>
+                            <h3 className="text-xl font-bold text-white mb-2">Cấp 1: Thế Giới Quan Duy Vật</h3>
+                            <p className="text-blue-400 text-xs font-bold uppercase tracking-wider mb-4">Nhận diện Thực tại</p>
+                            <div className="text-slate-400 text-sm space-y-3">
+                                <p><strong>Nhiệm vụ:</strong> Phân loại chính xác các hiện tượng vào nhóm "Vật chất" hoặc "Ý thức".</p>
+                                <p><strong>Bài học:</strong> Khắc sâu nguyên lý cơ bản: <em>"Vật chất có trước, ý thức có sau"</em>. Rèn luyện khả năng phân biệt giữa khách quan (sự thật) và chủ quan (suy nghĩ).</p>
+                            </div>
+                            <button onClick={() => onStart(1)} className="mt-6 w-full py-2 bg-slate-800 hover:bg-blue-600 rounded text-slate-300 hover:text-white font-bold text-sm transition-colors">Bắt đầu Cấp 1</button>
                         </div>
-                        <div>
-                            <h4 className="font-bold text-white mb-1 text-sm md:text-base">Xếp hạng & Thành tích</h4>
-                            <p className="text-xs text-slate-400">Tích lũy điểm XP qua từng cấp độ và cạnh tranh trên bảng xếp hạng toàn server.</p>
+
+                        {/* Level 2 Detail */}
+                        <div className="bg-gradient-to-b from-slate-900 to-slate-950 p-6 rounded-2xl border border-slate-800 hover:border-purple-500/50 transition-colors group">
+                            <div className="w-12 h-12 bg-purple-500/20 text-purple-400 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                                <Brain size={24} />
+                            </div>
+                            <h3 className="text-xl font-bold text-white mb-2">Cấp 2: Nguồn Gốc Ý Thức</h3>
+                            <p className="text-purple-400 text-xs font-bold uppercase tracking-wider mb-4">Giải mã Tư duy</p>
+                            <div className="text-slate-400 text-sm space-y-3">
+                                <p><strong>Nhiệm vụ:</strong> Kết nối các yếu tố: Lao động, Ngôn ngữ, Bộ óc người để mở khóa sự ra đời của Ý thức.</p>
+                                <p><strong>Bài học:</strong> Hiểu rõ nguồn gốc tự nhiên và nguồn gốc xã hội của ý thức. Ý thức không phải do thần thánh ban tặng, mà là kết quả của quá trình tiến hóa và lao động.</p>
+                            </div>
+                            <button onClick={() => onStart(2)} className="mt-6 w-full py-2 bg-slate-800 hover:bg-purple-600 rounded text-slate-300 hover:text-white font-bold text-sm transition-colors">Bắt đầu Cấp 2</button>
+                        </div>
+
+                        {/* Level 3 Detail */}
+                        <div className="bg-gradient-to-b from-slate-900 to-slate-950 p-6 rounded-2xl border border-slate-800 hover:border-green-500/50 transition-colors group">
+                            <div className="w-12 h-12 bg-green-500/20 text-green-400 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                                <Building2 size={24} />
+                            </div>
+                            <h3 className="text-xl font-bold text-white mb-2">Cấp 3: Phép Biện Chứng</h3>
+                            <p className="text-green-400 text-xs font-bold uppercase tracking-wider mb-4">Xây dựng & Kiến tạo</p>
+                            <div className="text-slate-400 text-sm space-y-3">
+                                <p><strong>Nhiệm vụ:</strong> Điều hành một xã hội giả lập. Cân bằng các chỉ số thông qua các quyết định dựa trên quy luật Mâu thuẫn và Lượng - Chất.</p>
+                                <p><strong>Bài học:</strong> Áp dụng triết học vào quản lý và đời sống. Hiểu rằng sự phát triển đến từ việc giải quyết các mâu thuẫn nội tại.</p>
+                            </div>
+                            <button onClick={() => onStart(3)} className="mt-6 w-full py-2 bg-slate-800 hover:bg-green-600 rounded text-slate-300 hover:text-white font-bold text-sm transition-colors">Bắt đầu Cấp 3</button>
                         </div>
                     </div>
+                </div>
 
-                    <div className="flex items-start gap-4 p-4 rounded-lg bg-slate-900/30">
-                        <div className="p-2 bg-slate-800 rounded-lg text-purple-400 shrink-0">
-                            <Brain size={20} />
-                        </div>
-                        <div>
-                            <h4 className="font-bold text-white mb-1 text-sm md:text-base">Hỗ trợ bởi AI</h4>
-                            <p className="text-xs text-slate-400">Tích hợp Gemini & OpenRouter để giải đáp mọi thắc mắc triết học của bạn trong thời gian thực.</p>
-                        </div>
-                    </div>
-
-                    <div className="flex items-start gap-4 p-4 rounded-lg bg-slate-900/30">
-                        <div className="p-2 bg-slate-800 rounded-lg text-green-400 shrink-0">
-                            <Shield size={20} />
-                        </div>
-                        <div>
-                            <h4 className="font-bold text-white mb-1 text-sm md:text-base">Chuẩn kiến thức</h4>
-                            <p className="text-xs text-slate-400">Nội dung được biên soạn bám sát giáo trình Triết học Mác - Lênin hiện hành.</p>
-                        </div>
+                {/* Section: Hướng dẫn chơi chung */}
+                <div className="bg-slate-900 rounded-2xl p-6 md:p-8 border border-slate-800">
+                    <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
+                        <BookOpen className="text-yellow-500" />
+                        Hướng Dẫn Chung
+                    </h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm md:text-base text-slate-300">
+                        <ul className="space-y-3">
+                            <li className="flex gap-3">
+                                <span className="font-bold text-blue-400">01.</span>
+                                <span>Hoàn thành từng cấp độ để mở khóa kiến thức tiếp theo.</span>
+                            </li>
+                            <li className="flex gap-3">
+                                <span className="font-bold text-blue-400">02.</span>
+                                <span>Sử dụng <strong>Tra cứu AI</strong> (biểu tượng kính lúp) bất cứ khi nào bạn gặp khái niệm khó hiểu.</span>
+                            </li>
+                        </ul>
+                        <ul className="space-y-3">
+                            <li className="flex gap-3">
+                                <span className="font-bold text-blue-400">03.</span>
+                                <span>Điểm số (XP) thể hiện mức độ thông thạo của bạn. Hãy ghi tên lên Bảng Xếp Hạng để vinh danh.</span>
+                            </li>
+                            <li className="flex gap-3">
+                                <span className="font-bold text-blue-400">04.</span>
+                                <span><strong>Lưu ý:</strong> Đừng sợ sai. Mỗi lần sai là một lần củng cố lại nhận thức để tiến gần hơn đến chân lý.</span>
+                            </li>
+                        </ul>
                     </div>
                 </div>
 
@@ -160,34 +166,53 @@ export const Home: React.FC<HomeProps> = ({ onStart }) => {
                             <h3 className="text-lg md:text-xl font-display font-bold text-white uppercase tracking-wider">Phụ Lục: Trí Tuệ Nhân Tạo Trong Hệ Thống</h3>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
-                            <div className="space-y-2 md:space-y-3">
-                                <h4 className="text-blue-300 font-bold flex items-center gap-2 text-sm md:text-base">
-                                    <span className="w-1.5 h-1.5 bg-blue-400 rounded-full"></span>
-                                    Tra Cứu Khái Niệm
-                                </h4>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+                            <div className="space-y-4">
+                                <div className="flex items-center gap-3">
+                                    <div className="p-2 bg-blue-500/20 rounded-lg">
+                                        <Zap size={18} className="text-blue-400" />
+                                    </div>
+                                    <h4 className="text-blue-300 font-bold">Google Gemini (Flash Model)</h4>
+                                </div>
                                 <p className="text-slate-400 text-xs md:text-sm leading-relaxed text-justify">
-                                    Sử dụng <strong>LLM (Large Language Models)</strong> để phân tích và giải thích các khái niệm triết học trừu tượng một cách dễ hiểu, chính xác theo ngữ cảnh câu hỏi của người học.
+                                    <strong>Vai trò: Bộ xử lý trung tâm (Core Processor).</strong><br />
+                                    Đảm nhiệm các tác vụ thời gian thực trong game:
                                 </p>
+                                <ul className="list-disc pl-5 text-slate-500 text-xs md:text-sm space-y-1">
+                                    <li>Phân tích phân loại Vật chất/Ý thức (Level 1).</li>
+                                    <li>Tạo câu hỏi trắc nghiệm tự động (Level 2).</li>
+                                    <li>Đóng vai NPCs và Cố vấn chiến lược (Level 3).</li>
+                                </ul>
                             </div>
 
-                            <div className="space-y-2 md:space-y-3">
-                                <h4 className="text-purple-300 font-bold flex items-center gap-2 text-sm md:text-base">
-                                    <span className="w-1.5 h-1.5 bg-purple-400 rounded-full"></span>
-                                    Cố Vấn Chiến Lược (Level 3)
-                                </h4>
+                            <div className="space-y-4">
+                                <div className="flex items-center gap-3">
+                                    <div className="p-2 bg-purple-500/20 rounded-lg">
+                                        <Brain size={18} className="text-purple-400" />
+                                    </div>
+                                    <h4 className="text-purple-300 font-bold">Meta Llama 3 (via OpenRouter)</h4>
+                                </div>
                                 <p className="text-slate-400 text-xs md:text-sm leading-relaxed text-justify">
-                                    AI đóng vai trò là "Cố vấn ảo", phân tích các chỉ số Sinh học, Kinh tế, Văn hóa của xã hội người chơi xây dựng để đưa ra lời khuyên phát triển cân bằng.
+                                    <strong>Vai trò: Thư viện tri thức (Knowledge Base).</strong><br />
+                                    Chuyên gia tra cứu và giải thích khái niệm:
                                 </p>
+                                <ul className="list-disc pl-5 text-slate-500 text-xs md:text-sm space-y-1">
+                                    <li>Hỗ trợ tính năng "Tra cứu" với độ chính xác cao.</li>
+                                    <li>Hệ thống dự phòng (Fallback) đảm bảo dịch vụ liên tục.</li>
+                                    <li>Cung cấp dẫn chứng và ví dụ thực tế.</li>
+                                </ul>
                             </div>
 
-                            <div className="space-y-2 md:space-y-3">
-                                <h4 className="text-green-300 font-bold flex items-center gap-2 text-sm md:text-base">
-                                    <span className="w-1.5 h-1.5 bg-green-400 rounded-full"></span>
-                                    Hệ Thống Phản Hồi
-                                </h4>
+                            <div className="space-y-4 md:col-span-2 border-t border-slate-800 pt-6">
+                                <div className="flex items-center gap-3">
+                                    <div className="p-2 bg-green-500/20 rounded-lg">
+                                        <Lightbulb size={18} className="text-green-400" />
+                                    </div>
+                                    <h4 className="text-green-300 font-bold">DeepSeek R1 (Tùy chọn)</h4>
+                                </div>
                                 <p className="text-slate-400 text-xs md:text-sm leading-relaxed text-justify">
-                                    Tự động đánh giá câu trả lời của người học, cung cấp phản hồi chi tiết về lý do đúng/sai dựa trên các nguyên lý của Chủ nghĩa Duy vật Biện chứng.
+                                    <strong>Vai trò: Nhà lý luận chuyên sâu (Deep Thinker).</strong><br />
+                                    Mô hình chuyên biệt cho các tác vụ suy luận phức tạp (Reasoning), được tích hợp sẵn trong mã nguồn để mở rộng khả năng phân tích các vấn đề triết học hóc búa nhất.
                                 </p>
                             </div>
                         </div>
