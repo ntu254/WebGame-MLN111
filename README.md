@@ -49,8 +49,8 @@ Tạo một file tên là `.env` tại **thư mục gốc** của dự án (ngan
 API_KEY=your_google_gemini_api_key
 
 # Cấu hình Supabase (TÙY CHỌN - Để lưu bảng xếp hạng)
-SUPABASE_URL=your_supabase_url
-SUPABASE_ANON_KEY=your_supabase_anon_key
+VITE_SUPABASE_URL=your_supabase_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 ```
 
 ### 5. Cấu hình Vite (Quan trọng!)

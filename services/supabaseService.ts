@@ -1,12 +1,20 @@
 import { createClient } from '@supabase/supabase-js';
 
 // Initialize Supabase client
-// NOTE: Ensure process.env.SUPABASE_URL and process.env.SUPABASE_ANON_KEY are set
-const supabaseUrl = process.env.SUPABASE_URL || '';
-const supabaseKey = process.env.SUPABASE_ANON_KEY || '';
+// NOTE: Ensure VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY are set
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
+const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
 
-const supabase = (supabaseUrl && supabaseKey) 
-    ? createClient(supabaseUrl, supabaseKey) 
+const isValidUrl = (url: string) => {
+    try {
+        return new URL(url).protocol.startsWith('http');
+    } catch {
+        return false;
+    }
+}
+
+const supabase = (supabaseUrl && supabaseKey && isValidUrl(supabaseUrl))
+    ? createClient(supabaseUrl, supabaseKey)
     : null;
 
 export interface LeaderboardEntry {
