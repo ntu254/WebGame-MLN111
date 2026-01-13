@@ -75,6 +75,24 @@ export const Home: React.FC<HomeProps> = ({ onStart }) => {
                     </div>
                 </div>
 
+                {/* YouTube Video Section */}
+                <div className="bg-slate-900 rounded-2xl p-6 md:p-8 border border-slate-800">
+                    <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
+                        <Play className="text-red-500" />
+                        Vật chất là gì ???
+                    </h2>
+                    <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+                        <iframe
+                            className="absolute top-0 left-0 w-full h-full rounded-xl"
+                            src="https://www.youtube.com/embed/5jHLeITs5QQ"
+                            title="Video Hướng Dẫn"
+                            frameBorder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                            allowFullScreen
+                        ></iframe>
+                    </div>
+                </div>
+
                 {/* Section: Hướng dẫn chi tiết các cấp độ */}
                 <div className="space-y-8 pt-8 border-t border-slate-800">
                     <h2 className="text-3xl font-bold text-white text-center mb-8">Lộ Trình Tư Duy (3 Cấp Độ)</h2>
@@ -166,6 +184,8 @@ export const Home: React.FC<HomeProps> = ({ onStart }) => {
                         </ul>
                     </div>
                 </div>
+
+
 
                 {/* AI Appendix Section */}
                 <div className="mt-8 md:mt-16 p-6 md:p-8 bg-gradient-to-br from-slate-900 to-slate-900/50 rounded-2xl border border-slate-800 relative overflow-hidden">
