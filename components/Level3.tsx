@@ -701,32 +701,103 @@ export const Level3: React.FC<Level3Props> = ({ onComplete, addLog }) => {
             {/* Help Modal - Responsive */}
             {showHelp && (
                 <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-                    <div className="bg-slate-900 border border-cyan-500 rounded-lg max-w-md w-full p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+                    <div className="bg-slate-900 border border-cyan-500 rounded-lg max-w-2xl w-full p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
                         <button onClick={toggleHelp} className="absolute top-4 right-4 text-slate-500 hover:text-white"><X size={20} /></button>
-                        <h3 className="text-xl md:text-2xl font-bold text-cyan-400 mb-4">🎮 Cách chơi</h3>
+                        <h3 className="text-2xl font-bold text-cyan-400 mb-4 text-center">🎮 HƯỚNG DẪN CHƠI CẤP ĐỘ 3</h3>
 
-                        {/* ... content ... */}
                         <div className="space-y-4 text-sm">
-                            <div className="bg-cyan-500/10 p-3 rounded-lg border border-cyan-500/30">
-                                <p className="text-cyan-400 font-bold">🎯 Mục tiêu chiến thắng:</p>
-                                <ul className="list-disc ml-5 mt-1 text-slate-300">
-                                    <li>Dân số: 300</li>
-                                    <li>Vật chất: 100</li>
-                                    <li>Ý thức: 100</li>
+                            {/* Mục tiêu */}
+                            <div className="bg-cyan-500/10 p-4 rounded-lg border border-cyan-500/30">
+                                <p className="text-cyan-400 font-bold mb-2">🎯 Mục tiêu chiến thắng</p>
+                                <p className="text-slate-300 mb-2">Đạt được cả 3 chỉ số sau:</p>
+                                <ul className="list-disc ml-5 text-slate-300 space-y-1">
+                                    <li><span className="text-green-400 font-bold">Dân số: 300</span> người</li>
+                                    <li><span className="text-blue-400 font-bold">Vật chất: 100</span> điểm</li>
+                                    <li><span className="text-purple-400 font-bold">Ý thức: 100</span> điểm</li>
                                 </ul>
                             </div>
 
-                            <div className="space-y-2">
-                                <p className="text-white font-bold">📋 Hướng dẫn:</p>
+                            {/* Cách chơi cơ bản */}
+                            <div className="bg-slate-800/50 p-4 rounded-lg border border-slate-700">
+                                <p className="text-white font-bold mb-2">📋 Cách chơi cơ bản</p>
                                 <ol className="text-slate-300 space-y-2 ml-4 list-decimal">
-                                    <li>Nhấn nút <span className="text-green-400">▶ Play</span> để bắt đầu</li>
-                                    <li>Chọn công trình ở thanh dưới</li>
-                                    <li>Click vào ô trống trên bản đồ để xây</li>
+                                    <li>Nhấn <span className="text-green-400 font-bold">▶ PLAY</span> để bắt đầu (thời gian chạy)</li>
+                                    <li><span className="text-yellow-400 font-bold">Chọn loại công trình</span> ở thanh dưới (Nông trại, Nhà máy, Trường, Công nghệ)</li>
+                                    <li><span className="text-blue-400 font-bold">Click vào ô trống</span> trên bản đồ để xây (các ô sẽ sáng màu xanh)</li>
+                                    <li>Quan sát các chỉ số tăng/giảm theo thời gian</li>
+                                    <li>Trả lời các <span className="text-red-400 font-bold">sự kiện biện chứng</span> khi xuất hiện</li>
                                 </ol>
                             </div>
+
+                            {/* Các loại công trình */}
+                            <div className="bg-slate-800/50 p-4 rounded-lg border border-slate-700">
+                                <p className="text-white font-bold mb-2">🏗️ Các loại công trình</p>
+                                <div className="space-y-2">
+                                    <div className="flex items-start gap-2">
+                                        <Wheat size={16} className="text-green-400 mt-0.5 shrink-0" />
+                                        <div>
+                                            <p className="text-green-400 font-bold">NÔNG TRẠI (20 thép)</p>
+                                            <p className="text-slate-400 text-xs">Tăng: Dân số +2/s, Lương thực +10/s</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-start gap-2">
+                                        <Factory size={16} className="text-blue-400 mt-0.5 shrink-0" />
+                                        <div>
+                                            <p className="text-blue-400 font-bold">NHÀ MÁY (30 thép)</p>
+                                            <p className="text-slate-400 text-xs">Tăng: Vật chất +2/s, Thép +8/s</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-start gap-2">
+                                        <GraduationCap size={16} className="text-purple-400 mt-0.5 shrink-0" />
+                                        <div>
+                                            <p className="text-purple-400 font-bold">TRƯỜNG HỌC (25 thép + 20 lương thực)</p>
+                                            <p className="text-slate-400 text-xs">Tăng: Ý thức +2/s, Lao động +3/s</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-start gap-2">
+                                        <Cpu size={16} className="text-cyan-400 mt-0.5 shrink-0" />
+                                        <div>
+                                            <p className="text-cyan-400 font-bold">CÔNG NGHỆ (40 thép + 30 lương thực)</p>
+                                            <p className="text-slate-400 text-xs">Tăng: Vật chất +1/s, Ý thức +2/s</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Cơ chế tiêu hao */}
+                            <div className="bg-red-900/20 p-4 rounded-lg border border-red-500/30">
+                                <p className="text-red-400 font-bold mb-2">⚠️ Cơ chế tiêu hao (quan trọng!)</p>
+                                <ul className="text-slate-300 space-y-1 text-xs">
+                                    <li>• <span className="text-blue-400">Vật chất</span> bị tiêu hao: 1 + (Dân số ÷ 25) điểm/s</li>
+                                    <li>• <span className="text-purple-400">Ý thức</span> bị tiêu hao: 0.5 + (Dân số ÷ 40) điểm/s</li>
+                                    <li>• <span className="text-amber-400">Lương thực</span> tiêu hao: (Dân số ÷ 50) đơn vị/s</li>
+                                    <li className="text-yellow-300">➜ Dân số càng đông, tiêu hao càng nhanh!</li>
+                                </ul>
+                            </div>
+
+                            {/* Chiến lược */}
+                            <div className="bg-green-900/20 p-4 rounded-lg border border-green-500/30">
+                                <p className="text-green-400 font-bold mb-2">💡 Mẹo chiến lược</p>
+                                <ul className="text-slate-300 space-y-1 text-xs">
+                                    <li>✓ Xây <span className="text-green-400">Nông trại</span> trước để có dân số và lương thực</li>
+                                    <li>✓ Cân bằng <span className="text-blue-400">Vật chất</span> và <span className="text-purple-400">Ý thức</span> (tránh lệch quá 2.5 lần)</li>
+                                    <li>✓ Đừng để Vật chất {"<"} 30 (Ý thức sẽ giảm nhanh!)</li>
+                                    <li>✓ Trả lời đúng sự kiện để nhận thưởng lớn</li>
+                                    <li>✓ Sự kiện xuất hiện khi xây được 3, 6, 9, 12 công trình</li>
+                                </ul>
+                            </div>
+
+                            {/* Triết lý */}
+                            <div className="bg-purple-900/20 p-3 rounded-lg border border-purple-500/30">
+                                <p className="text-purple-400 font-bold text-xs italic mb-1">📚 Triết lý biện chứng:</p>
+                                <p className="text-slate-400 text-xs leading-relaxed">
+                                    "Vật chất quyết định ý thức, nhưng ý thức có tính độc lập tương đối và tác động ngược lại." - Cần phát triển cả kinh tế (vật chất) lẫn văn hóa (ý thức) một cách hài hòa!
+                                </p>
+                            </div>
                         </div>
-                        <button onClick={toggleHelp} className="w-full mt-6 bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-3 rounded-lg text-lg">
-                            BẮT ĐẦU CHƠI!
+
+                        <button onClick={toggleHelp} className="w-full mt-6 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold py-3 rounded-lg text-lg transition-all shadow-lg">
+                            BẮT ĐẦU XÂY DỰNG! 🚀
                         </button>
                     </div>
                 </div>
