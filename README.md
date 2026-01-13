@@ -36,6 +36,13 @@ Dự án sử dụng **Google Gemini (Flash Model)** làm bộ xử lý trung t�
 - **Game Master:** Tự động tạo câu hỏi trắc nghiệm ngữ cảnh, không trùng lặp.
 - **Judge (Trọng tài):** Phân tích câu trả lời của người chơi trong các tình huống khó.
 - **Advisor (Cố vấn):** Đóng vai các nhà tư tưởng để đưa ra gợi ý trong Level 3.
+- **Concept Search:** Tìm kiếm và giải thích các khái niệm triết học với Google Search integration.
+
+### API Key Tùy chỉnh
+Người dùng có thể cấu hình API key Gemini riêng của mình thông qua giao diện **Cài đặt** (icon bánh răng):
+- Hỗ trợ fallback tự động: Nếu API key bị quota, hệ thống sẽ tự động chuyển sang OpenRouter
+- Lưu trữ an toàn trong localStorage của trình duyệt
+- Lấy API key miễn phí tại: [Google AI Studio](https://aistudio.google.com/app/apikey)
 
 ---
 
