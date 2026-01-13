@@ -1,14 +1,89 @@
-import React from 'react';
-import { Play, BookOpen, Brain, Zap, Building2, ArrowRight, Star, Shield, Users, Lightbulb, Target, HeartHandshake } from 'lucide-react';
+import React, { useState } from 'react';
+import { Play, BookOpen, Brain, Zap, Building2, ArrowRight, Star, Shield, Users, Lightbulb, Target, HeartHandshake, Compass, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface HomeProps {
     onStart: (level: number) => void;
 }
 
 export const Home: React.FC<HomeProps> = ({ onStart }) => {
+    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+
+    const scrollToSection = (id: string) => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    };
+
     return (
         <div className="h-full w-full overflow-y-auto bg-slate-950 p-4 md:p-12 scrollbar-thin scrollbar-thumb-slate-800">
             <div className="max-w-6xl mx-auto space-y-16 animate-in fade-in duration-700 slide-in-from-bottom-4">
+
+                {/* Quick Navigation Menu - Vertical Sidebar */}
+                <div className={`hidden lg:fixed lg:flex lg:flex-col top-24 z-50 bg-slate-900/90 backdrop-blur-lg border border-slate-800 rounded-2xl p-4 shadow-xl w-56 transition-all duration-300 ${isSidebarOpen ? 'left-4' : '-left-56'
+                    }`}>
+                    <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
+                        <div className="flex items-center gap-3">
+                            <Compass className="text-blue-400" size={20} />
+                            <h3 className="text-sm font-bold text-white">Điều Hướng</h3>
+                        </div>
+                        <button
+                            onClick={() => setIsSidebarOpen(false)}
+                            className="p-1 hover:bg-slate-800 rounded transition-colors"
+                            title="Đóng"
+                        >
+                            <ChevronLeft className="text-slate-400 hover:text-white" size={16} />
+                        </button>
+                    </div>
+                    <div className="flex flex-col gap-2">
+                        <button
+                            onClick={() => scrollToSection('purpose-section')}
+                            className="px-3 py-2.5 text-xs font-medium bg-slate-800 hover:bg-blue-600 text-slate-300 hover:text-white rounded-lg transition-colors text-left flex items-center gap-2"
+                        >
+                            <Target size={14} />
+                            Mục đích & Ý nghĩa
+                        </button>
+                        <button
+                            onClick={() => scrollToSection('video-section')}
+                            className="px-3 py-2.5 text-xs font-medium bg-slate-800 hover:bg-red-600 text-slate-300 hover:text-white rounded-lg transition-colors text-left flex items-center gap-2"
+                        >
+                            <Play size={14} />
+                            Video Section
+                        </button>
+                        <button
+                            onClick={() => scrollToSection('levels-section')}
+                            className="px-3 py-2.5 text-xs font-medium bg-slate-800 hover:bg-purple-600 text-slate-300 hover:text-white rounded-lg transition-colors text-left flex items-center gap-2"
+                        >
+                            <Brain size={14} />
+                            3 Cấp Độ Tư Duy
+                        </button>
+                        <button
+                            onClick={() => scrollToSection('guide-section')}
+                            className="px-3 py-2.5 text-xs font-medium bg-slate-800 hover:bg-yellow-600 text-slate-300 hover:text-white rounded-lg transition-colors text-left flex items-center gap-2"
+                        >
+                            <BookOpen size={14} />
+                            Hướng Dẫn Chung
+                        </button>
+                        <button
+                            onClick={() => scrollToSection('ai-section')}
+                            className="px-3 py-2.5 text-xs font-medium bg-slate-800 hover:bg-green-600 text-slate-300 hover:text-white rounded-lg transition-colors text-left flex items-center gap-2"
+                        >
+                            <Lightbulb size={14} />
+                            Phụ Lục AI
+                        </button>
+                    </div>
+                </div>
+
+                {/* Toggle Button - Show when sidebar is closed */}
+                {!isSidebarOpen && (
+                    <button
+                        onClick={() => setIsSidebarOpen(true)}
+                        className="hidden lg:block fixed left-4 top-24 z-50 p-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl shadow-xl transition-all duration-300 hover:scale-110"
+                        title="Mở điều hướng"
+                    >
+                        <ChevronRight size={20} />
+                    </button>
+                )}
 
                 {/* Hero Section */}
                 <div className="text-center space-y-6 relative py-12">
@@ -39,7 +114,7 @@ export const Home: React.FC<HomeProps> = ({ onStart }) => {
                 </div>
 
                 {/* Section: Mục đích & Ý nghĩa */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
+                <div id="purpose-section" className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 scroll-mt-24">
                     <div className="space-y-6">
                         <h2 className="text-2xl font-bold text-white flex items-center gap-3">
                             <Target className="text-red-500" />
@@ -76,7 +151,7 @@ export const Home: React.FC<HomeProps> = ({ onStart }) => {
                 </div>
 
                 {/* YouTube Video Section */}
-                <div className="bg-slate-900 rounded-2xl p-6 md:p-8 border border-slate-800">
+                <div id="video-section" className="bg-slate-900 rounded-2xl p-6 md:p-8 border border-slate-800 scroll-mt-24">
                     <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
                         <Play className="text-red-500" />
                         Vật chất là gì ???
@@ -84,7 +159,7 @@ export const Home: React.FC<HomeProps> = ({ onStart }) => {
                     <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
                         <iframe
                             className="absolute top-0 left-0 w-full h-full rounded-xl"
-                            src="https://www.youtube.com/embed/5jHLeITs5QQ"
+                            src="https://youtu.be/nxKa5Agkzbg"
                             title="Video Hướng Dẫn"
                             frameBorder="0"
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -94,7 +169,7 @@ export const Home: React.FC<HomeProps> = ({ onStart }) => {
                 </div>
 
                 {/* Section: Hướng dẫn chi tiết các cấp độ */}
-                <div className="space-y-8 pt-8 border-t border-slate-800">
+                <div id="levels-section" className="space-y-8 pt-8 border-t border-slate-800 scroll-mt-24">
                     <h2 className="text-3xl font-bold text-white text-center mb-8">Lộ Trình Tư Duy (3 Cấp Độ)</h2>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -156,7 +231,7 @@ export const Home: React.FC<HomeProps> = ({ onStart }) => {
                 </div>
 
                 {/* Section: Hướng dẫn chơi chung */}
-                <div className="bg-slate-900 rounded-2xl p-6 md:p-8 border border-slate-800">
+                <div id="guide-section" className="bg-slate-900 rounded-2xl p-6 md:p-8 border border-slate-800 scroll-mt-24">
                     <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
                         <BookOpen className="text-yellow-500" />
                         Hướng Dẫn Chung
@@ -188,7 +263,7 @@ export const Home: React.FC<HomeProps> = ({ onStart }) => {
 
 
                 {/* AI Appendix Section */}
-                <div className="mt-8 md:mt-16 p-6 md:p-8 bg-gradient-to-br from-slate-900 to-slate-900/50 rounded-2xl border border-slate-800 relative overflow-hidden">
+                <div id="ai-section" className="mt-8 md:mt-16 p-6 md:p-8 bg-gradient-to-br from-slate-900 to-slate-900/50 rounded-2xl border border-slate-800 relative overflow-hidden scroll-mt-24">
                     <div className="absolute top-0 right-0 p-32 bg-blue-500/5 rounded-full blur-3xl pointer-events-none"></div>
 
                     <div className="relative z-10">
