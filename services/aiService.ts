@@ -1,7 +1,7 @@
 // AI Service with Fallback - Try Cerebras first, then Gemini (with user's custom API key), then OpenRouter
 import { generateSkillNodeQuestion as geminiGenerateQuestion, searchPhilosophicalConcept as geminiSearchConcept } from './geminiService';
 import { generateSkillNodeQuestion as openRouterGenerateQuestion, searchPhilosophicalConceptOpenRouter } from './openRouterService';
-import { searchPhilosophicalConceptCerebras } from './cerebrasService';
+import { generateSkillNodeQuestion as cerebrasGenerateQuestion, searchPhilosophicalConceptCerebras } from './cerebrasService';
 
 // Mock questions for Level 2 when all AI services fail
 const MOCK_QUESTIONS: Record<string, { question: string; options: string[]; correctAnswerIndex: number }> = {
@@ -79,44 +79,59 @@ const MOCK_QUESTIONS: Record<string, { question: string; options: string[]; corr
 
 // For quiz generation (Level 2)
 export const generateSkillNodeQuestionWithFallback = async (nodeName: string): Promise<{ question: string; options: string[]; correctAnswerIndex: number }> => {
+    // Try Cerebras first (fastest and you have the API key!)
     try {
-        console.log('🔄 Trying Gemini AI for quiz...');
-        const result = await geminiGenerateQuestion(nodeName);
+        console.log('🔄 Trying Cerebras AI for quiz (llama-3.3-70b)...');
+        const result = await cerebrasGenerateQuestion(nodeName);
 
-        // Check if it's a real response (not error/fallback message)
-        if (result.question && !result.question.includes('Lỗi') && !result.question.includes('giả lập')) {
-            console.log('✅ Gemini AI success!');
+        if (result.question && result.options && result.options.length > 0) {
+            console.log('✅ Cerebras AI success!');
             return result;
         }
-        throw new Error('Gemini returned fallback response');
-    } catch (geminiError) {
-        console.warn('⚠️ Gemini failed, switching to OpenRouter...', geminiError);
+        throw new Error('Cerebras returned invalid response');
+    } catch (cerebrasError) {
+        console.warn('⚠️ Cerebras failed, switching to Gemini...', cerebrasError);
 
+        // Try Gemini as backup
         try {
-            const result = await openRouterGenerateQuestion(nodeName);
-            console.log('✅ OpenRouter AI success!');
-            return result;
-        } catch (openRouterError) {
-            console.error('❌ Both AI services failed, using mock questions', openRouterError);
+            console.log('🔄 Trying Gemini AI for quiz...');
+            const result = await geminiGenerateQuestion(nodeName);
 
-            // Use mock questions as fallback
-            const mockQuestion = MOCK_QUESTIONS[nodeName];
-            if (mockQuestion) {
-                console.log(`📚 Using mock question for: ${nodeName}`);
-                return mockQuestion;
+            // Check if it's a real response (not error/fallback message)
+            if (result.question && !result.question.includes('Lỗi') && !result.question.includes('giả lập')) {
+                console.log('✅ Gemini AI success!');
+                return result;
             }
+            throw new Error('Gemini returned fallback response');
+        } catch (geminiError) {
+            console.warn('⚠️ Gemini failed, switching to OpenRouter...', geminiError);
 
-            // Final fallback if node name not found in mock data
-            return {
-                question: `Câu hỏi về ${nodeName}: Theo quan điểm duy vật biện chứng, ${nodeName.toLowerCase()} có vai trò như thế nào?`,
-                options: [
-                    `${nodeName} có vai trò quan trọng trong triết học Mác`,
-                    `${nodeName} không liên quan đến vật chất`,
-                    `${nodeName} là hiện tượng siêu nhiên`,
-                    `${nodeName} chỉ tồn tại trong tưởng tượng`
-                ],
-                correctAnswerIndex: 0
-            };
+            try {
+                const result = await openRouterGenerateQuestion(nodeName);
+                console.log('✅ OpenRouter AI success!');
+                return result;
+            } catch (openRouterError) {
+                console.error('❌ All AI services failed, using mock questions', openRouterError);
+
+                // Use mock questions as fallback
+                const mockQuestion = MOCK_QUESTIONS[nodeName];
+                if (mockQuestion) {
+                    console.log(`📚 Using mock question for: ${nodeName}`);
+                    return mockQuestion;
+                }
+
+                // Final fallback if node name not found in mock data
+                return {
+                    question: `Câu hỏi về ${nodeName}: Theo quan điểm duy vật biện chứng, ${nodeName.toLowerCase()} có vai trò như thế nào?`,
+                    options: [
+                        `${nodeName} có vai trò quan trọng trong triết học Mác`,
+                        `${nodeName} không liên quan đến vật chất`,
+                        `${nodeName} là hiện tượng siêu nhiên`,
+                        `${nodeName} chỉ tồn tại trong tưởng tượng`
+                    ],
+                    correctAnswerIndex: 0
+                };
+            }
         }
     }
 };
