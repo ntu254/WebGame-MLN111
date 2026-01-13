@@ -3,6 +3,80 @@ import { generateSkillNodeQuestion as geminiGenerateQuestion, searchPhilosophica
 import { generateSkillNodeQuestion as openRouterGenerateQuestion, searchPhilosophicalConceptOpenRouter } from './openRouterService';
 import { searchPhilosophicalConceptCerebras } from './cerebrasService';
 
+// Mock questions for Level 2 when all AI services fail
+const MOCK_QUESTIONS: Record<string, { question: string; options: string[]; correctAnswerIndex: number }> = {
+    'Ý Thức': {
+        question: 'Theo quan điểm duy vật biện chứng, ý thức là gì?',
+        options: [
+            'Sản phẩm của não bộ, phản ánh thế giới khách quan',
+            'Một thực thể độc lập tồn tại riêng biệt',
+            'Hiện tượng siêu nhiên không thể giải thích',
+            'Năng lực bẩm sinh từ khi sinh ra'
+        ],
+        correctAnswerIndex: 0
+    },
+    'Bộ Óc': {
+        question: 'Vai trò của bộ óc đối với ý thức là gì?',
+        options: [
+            'Không liên quan, ý thức tồn tại độc lập',
+            'Bộ óc là cơ quan vật chất của ý thức',
+            'Bộ óc chỉ là nơi lưu trữ trí nhớ',
+            'Bộ óc tạo ra linh hồn'
+        ],
+        correctAnswerIndex: 1
+    },
+    'Lao động': {
+        question: 'Theo Ph.Ăngghen, vai trò của lao động trong sự hình thành con người như thế nào?',
+        options: [
+            'Lao động giúp kiếm sống',
+            'Lao động là điều kiện cơ bản đầu tiên của toàn bộ đời sống loài người',
+            'Lao động chỉ phát triển cơ bắp',
+            'Lao động là hình phạt của thần linh'
+        ],
+        correctAnswerIndex: 1
+    },
+    'Phản Ánh': {
+        question: 'Phản ánh là thuộc tính của cái gì?',
+        options: [
+            'Chỉ của con người',
+            'Chỉ của động vật có não',
+            'Thuộc tính chung của mọi vật chất',
+            'Chỉ của sinh vật sống'
+        ],
+        correctAnswerIndex: 2
+    },
+    'Ngôn ngữ': {
+        question: 'Quan hệ giữa ngôn ngữ và tư duy là gì?',
+        options: [
+            'Ngôn ngữ là vỏ vật chất của tư duy',
+            'Ngôn ngữ và tư duy không liên quan',
+            'Tư duy có thể tồn tại không cần ngôn ngữ',
+            'Ngôn ngữ quan trọng hơn tư duy'
+        ],
+        correctAnswerIndex: 0
+    },
+    'Tâm lý Xã hội': {
+        question: 'Tâm lý xã hội là gì?',
+        options: [
+            'Khoa học nghiên cứu hành vi',
+            'Những tình cảm, thói quen, truyền thống của cộng đồng',
+            'Bệnh lý tâm thần',
+            'Tư tưởng của các nhà lãnh đạo'
+        ],
+        correctAnswerIndex: 1
+    },
+    'Hệ tư tưởng': {
+        question: 'Hệ tư tưởng bao gồm những gì?',
+        options: [
+            'Chỉ có triết học',
+            'Chỉ có chính trị',
+            'Triết học, chính trị, pháp quyền, đạo đức, nghệ thuật',
+            'Chỉ có văn học và nghệ thuật'
+        ],
+        correctAnswerIndex: 2
+    }
+};
+
 // For quiz generation (Level 2)
 export const generateSkillNodeQuestionWithFallback = async (nodeName: string): Promise<{ question: string; options: string[]; correctAnswerIndex: number }> => {
     try {
@@ -23,10 +97,24 @@ export const generateSkillNodeQuestionWithFallback = async (nodeName: string): P
             console.log('✅ OpenRouter AI success!');
             return result;
         } catch (openRouterError) {
-            console.error('❌ Both AI services failed', openRouterError);
+            console.error('❌ Both AI services failed, using mock questions', openRouterError);
+
+            // Use mock questions as fallback
+            const mockQuestion = MOCK_QUESTIONS[nodeName];
+            if (mockQuestion) {
+                console.log(`📚 Using mock question for: ${nodeName}`);
+                return mockQuestion;
+            }
+
+            // Final fallback if node name not found in mock data
             return {
-                question: `Cả hai dịch vụ AI đều không khả dụng. Câu hỏi về ${nodeName}?`,
-                options: ["Vui lòng thử lại sau"],
+                question: `Câu hỏi về ${nodeName}: Theo quan điểm duy vật biện chứng, ${nodeName.toLowerCase()} có vai trò như thế nào?`,
+                options: [
+                    `${nodeName} có vai trò quan trọng trong triết học Mác`,
+                    `${nodeName} không liên quan đến vật chất`,
+                    `${nodeName} là hiện tượng siêu nhiên`,
+                    `${nodeName} chỉ tồn tại trong tưởng tượng`
+                ],
                 correctAnswerIndex: 0
             };
         }

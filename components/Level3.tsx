@@ -290,11 +290,11 @@ export const Level3: React.FC<Level3Props> = ({ onComplete, addLog }) => {
         }));
     };
 
-    const handleBuild = (type: BuildingType) => {
-        // Find empty spot
-        const emptyIdx = buildings.findIndex(b => b.type === 'empty');
-        if (emptyIdx === -1) {
-            addLog("Không còn chỗ trống để xây dựng!", 'error');
+    const handleBuild = (type: BuildingType, idx: number) => {
+        // Check if position is empty
+        if (buildings[idx].type !== 'empty') {
+            addLog("Vị trí này đã có công trình!", 'error');
+            playSound('error');
             return;
         }
 
@@ -319,7 +319,7 @@ export const Level3: React.FC<Level3Props> = ({ onComplete, addLog }) => {
 
         setBuildings(prev => {
             const newBuildings = [...prev];
-            newBuildings[emptyIdx] = { type, name, level: 1 };
+            newBuildings[idx] = { type, name, level: 1 };
             return newBuildings;
         });
 
@@ -549,12 +549,14 @@ export const Level3: React.FC<Level3Props> = ({ onComplete, addLog }) => {
                             {buildings.map((building, idx) => (
                                 <div
                                     key={idx}
-                                    onClick={() => building.type === 'empty' && selectedBuildType && handleBuild(selectedBuildType)}
+                                    onClick={() => building.type === 'empty' && selectedBuildType && handleBuild(selectedBuildType, idx)}
                                     className={`
-                    w-16 h-16 md:w-24 md:h-24 rounded-lg transition-all duration-300 relative group cursor-pointer
-                    ${building.type === 'empty'
-                                            ? 'bg-slate-800/30 hover:bg-slate-700/50 border-2 border-dashed border-slate-700 hover:border-slate-500'
-                                            : 'bg-gradient-to-br from-slate-700/50 to-slate-800/70 border border-slate-600/50 shadow-xl'}
+                    w-16 h-16 md:w-24 md:h-24 rounded-lg transition-all duration-300 relative group 
+                    ${building.type === 'empty' && selectedBuildType
+                                            ? 'cursor-pointer bg-slate-700/50 hover:bg-blue-600/30 border-2 border-dashed border-blue-500 hover:border-blue-400 hover:scale-105'
+                                            : building.type === 'empty'
+                                                ? 'bg-slate-800/30 border-2 border-dashed border-slate-700 cursor-default'
+                                                : 'bg-gradient-to-br from-slate-700/50 to-slate-800/70 border border-slate-600/50 shadow-xl cursor-default'}
                   `}
                                 >
                                     {building.type !== 'empty' && (
@@ -578,7 +580,7 @@ export const Level3: React.FC<Level3Props> = ({ onComplete, addLog }) => {
                                         </>
                                     )}
                                     {building.type === 'empty' && selectedBuildType && (
-                                        <div className="absolute inset-0 flex items-center justify-center text-slate-500">
+                                        <div className="absolute inset-0 flex items-center justify-center text-blue-400 animate-pulse">
                                             <Plus size={20} className="md:w-6 md:h-6" />
                                         </div>
                                     )}
